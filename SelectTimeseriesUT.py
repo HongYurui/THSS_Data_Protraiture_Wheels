@@ -1,4 +1,5 @@
 import unittest
+import select
 
 from SelectTimeseries import SelectTimeseries
 

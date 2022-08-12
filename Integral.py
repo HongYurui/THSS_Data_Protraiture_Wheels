@@ -1,0 +1,88 @@
+from datetime import datetime
+import pandas as pd
+from FlokAlgorithmLocal import FlokAlgorithmLocal, FlokDataFrame
+
+class Integral(FlokAlgorithmLocal):
+    def run(self, inputDataSets, params):
+        input_data = inputDataSets.get(0)
+        output_data = pd.DataFrame([[0] * input_data.shape[1]], index=range(1), columns=input_data.columns)
+        time_data = pd.Series([datetime.strptime(data, "%Y-%m-%d %H:%M:%S") for data in input_data.iloc[:, 0]])
+        
+        # integration
+        for column in range(1, input_data.shape[1]):
+            column_data = input_data.iloc[:, column].astype(float)
+            i = 0
+            while i < len(column_data) - 1:
+                j = i + 1
+                while pd.isnull(column_data[j]):
+                    j += 1
+                output_data.iloc[0, column] += (column_data[i] + column_data[j]) * (time_data[j] -time_data[i]).seconds / 2
+                i = j
+        
+        # time unit conversion
+        unit = params.get("unit", "1s")
+        if unit == "1S":
+            ratio = 0.001
+        elif unit == "1s":
+            ratio = 1
+        elif unit == "1m":
+            ratio = 60
+        elif unit == "1h":
+            ratio = 3600
+        elif unit == "1d":
+            ratio = 3600 * 24
+        else:
+            raise Exception("Invalid unit: " + unit)
+        
+        output_data.iloc[0, 0] = time_data[0].strftime("%Y-%m-%d 00:00:00")
+        output_data.iloc[0, 1:] /= ratio
+        result = FlokDataFrame()
+        result.addDF(output_data)
+        return result
+        
+if __name__ == "__main__":
+    algorithm = Integral()
+
+    all_info_1 = {
+        "input": ["./test_in.csv"],
+        "inputFormat": ["csv"],
+        "inputLocation": ["local_fs"],
+        "output": ["./test_out_1.csv"],
+        "outputFormat": ["csv"],
+        "outputLocation": ["local_fs"],
+        "parameters": {"unit": "1S"}
+    }
+
+    params = all_info_1["parameters"]
+    inputPaths = all_info_1["input"]
+    inputTypes = all_info_1["inputFormat"]
+    inputLocation = all_info_1["inputLocation"]
+    outputPaths = all_info_1["output"]
+    outputTypes = all_info_1["outputFormat"]
+    outputLocation = all_info_1["outputLocation"]
+
+    dataSet = algorithm.read(inputPaths, inputTypes, inputLocation, outputPaths, outputTypes)
+    result = algorithm.run(dataSet, params)
+    algorithm.write(outputPaths, result, outputTypes, outputLocation)
+
+    all_info_2 = {
+        "input": ["./test_in.csv"],
+        "inputFormat": ["csv"],
+        "inputLocation": ["local_fs"],
+        "output": ["./test_out_2.csv"],
+        "outputFormat": ["csv"],
+        "outputLocation": ["local_fs"],
+        "parameters": {"timeseries": "Time,root.test.d2.s2"}
+    }
+
+    params = all_info_2["parameters"]
+    inputPaths = all_info_2["input"]
+    inputTypes = all_info_2["inputFormat"]
+    inputLocation = all_info_2["inputLocation"]
+    outputPaths = all_info_2["output"]
+    outputTypes = all_info_2["outputFormat"]
+    outputLocation = all_info_2["outputLocation"]
+
+    dataSet = algorithm.read(inputPaths, inputTypes, inputLocation, outputPaths, outputTypes)
+    result = algorithm.run(dataSet, params)
+    algorithm.write(outputPaths, result, outputTypes, outputLocation)
