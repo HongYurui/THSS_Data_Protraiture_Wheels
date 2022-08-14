@@ -20,19 +20,18 @@ class histogram(FlokAlgorithmLocal):
                 max_ = max_value
             bucket = [0]*count
             Time = []
-            for j in range(len(output_data['root.test.d2.s2'])):
-                if output_data['root.test.d2.s2'][j] < min:
+            for j in range(len(output_data[column])):
+                if output_data[column][j] < min:
                     bucket[0] += 1
-                elif output_data['root.test.d2.s2'][j] >= max_:
-                    # print(output_data['root.test.d2.s2'][j])
+                elif output_data[column][j] >= max_:
+                    # print(output_data[column][j])
                     bucket[-1] += 1
                 else:
                     for i in range(1, count+1):
-                        if (output_data['root.test.d2.s2'][j] >= min+(i-1)*(max_-min)/count
-                                and output_data['root.test.d2.s2'][j] < min+i*(max_-min)/count):
+                        if (output_data[column][j] >= min+(i-1)*(max_-min)/count
+                                and output_data[column][j] < min+i*(max_-min)/count):
                             bucket[i-1] += 1
-            for i in range(0, count):
-                Time.append(output_data['Time'][i])
+            Time = output_data['Time'][0:count]
             j = 'histogram({f})'.format(f=timeseries_list[1])
             data = {'Time': Time, j: bucket}
             output_data = pd.DataFrame(data)
@@ -76,7 +75,7 @@ if __name__ == "__main__":
         "output": ["./test_out_2.csv"],
         "outputFormat": ["csv"],
         "outputLocation": ["local_fs"],
-        "parameters": {"timeseries": "Time,root.test.d2.s2"}
+        "parameters": {"timeseries": "Time,root.test.d1.s1"}
     }
 
     params = all_info_2["parameters"]
