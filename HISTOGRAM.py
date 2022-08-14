@@ -9,9 +9,7 @@ class histogram(FlokAlgorithmLocal):
             timeseries_list = timeseries.split(',')
             output_data = input_data[timeseries_list]
             column=timeseries_list[1]
-            print(output_data[column])
             max_value = max(output_data[column])
-            print(max_value)
             if min:
                 pass
             else:
@@ -22,7 +20,6 @@ class histogram(FlokAlgorithmLocal):
                 max_ = max_value
             bucket = [0]*count
             Time = []
-            print(min,max_)
             for j in range(len(output_data['root.test.d2.s2'])):
                 if output_data['root.test.d2.s2'][j] < min:
                     bucket[0] += 1
