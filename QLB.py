@@ -2,19 +2,23 @@ from datetime import datetime
 import pandas as pd
 from FlokAlgorithmLocal import FlokAlgorithmLocal, FlokDataFrame
 
-class Mad(FlokAlgorithmLocal):
+class QLB(FlokAlgorithmLocal):
     def run(self, inputDataSets, params):
         input_data = inputDataSets.get(0)
-        output_data = pd.DataFrame([[0, 0]], index=range(1), columns=input_data.columns)
-        output_data.iloc[0, 0] = datetime.strptime(input_data.iloc[0, 0], "%Y-%m-%d %H:%M:%S").strftime("%Y-%m-%d 00:00:00")
-        output_data.iloc[0, 1] = input_data.iloc[:, 1].astype(float).mad()
-        print(output_data)
+        output_data = pd.DataFrame([[0] * input_data.shape[1]], index=range(1), columns=input_data.columns)
+        time_data = pd.Series([datetime.strptime(data, "%Y-%m-%d %H:%M:%S") for data in input_data.iloc[:, 0].values])
+        
+        # 
+        for column in range(1, input_data.shape[1]):
+            pass
+        
+        output_data.iloc[0, 0] = time_data[0].strftime("%Y-%m-%d 00:00:00")
         result = FlokDataFrame()
         result.addDF(output_data)
         return result
         
 if __name__ == "__main__":
-    algorithm = Mad()
+    algorithm = QLB()
 
     all_info_1 = {
         "input": ["./test_in.csv"],
@@ -35,8 +39,6 @@ if __name__ == "__main__":
     outputLocation = all_info_1["outputLocation"]
 
     dataSet = algorithm.read(inputPaths, inputTypes, inputLocation, outputPaths, outputTypes)
-    from SelectTimeseries import SelectTimeseries
-    dataSet = SelectTimeseries().run(dataSet, {"timeseries": "Time,root.test.d2.s2"})
     result = algorithm.run(dataSet, params)
     algorithm.write(outputPaths, result, outputTypes, outputLocation)
 
