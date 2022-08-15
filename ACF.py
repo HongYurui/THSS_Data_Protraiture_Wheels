@@ -4,6 +4,19 @@ import pandas as pd
 import time
 
 class acf(FlokAlgorithmLocal):
+    def run_acf(x,end_value):
+        len_x = len(x)
+        q = ([0]*len_x)
+        p = []
+        for i in range(len_x):
+            q = (x[i:len_x+1])
+            if len(q) < len_x:
+                q+=[0]*(len_x-len(q))
+            p.append(np.dot(q, x))
+        p.reverse()
+        for i in range(0, len_x-1):
+            p.append(p[len_x-2-i])
+        return list(p/end_value)
     def run(self, inputDataSets, params,time_=0):
         input_data = inputDataSets.get(0)
         timeseries = params.get("timeseries", None)
@@ -13,16 +26,14 @@ class acf(FlokAlgorithmLocal):
             output_data = input_data[timeseries_list]
             time0=output_data['Time'][0]
             time0_ = time.mktime(time.strptime(time0, '%Y-%m-%d %H:%M:%S'))
-            count = int(time.mktime(time.strptime(
-                time_, '%Y-%m-%d %H:%M:%S'))-time0_)
+            count = int(time.mktime(time.strptime(time_, '%Y-%m-%d %H:%M:%S'))-time0_)
             output_data.fillna(0, inplace=True)
             a = output_data[timeseries_list[1]][0:count]
-            c = np.correlate(a, a, mode='full') / \
-                output_data[timeseries_list[1]].values[count-1]
+            end_value=output_data[timeseries_list[1]].values[count-1]
+            c=acf.run_acf(list(a),end_value)
             Time = []
             for i in range(0, 2*count-1):
-                q = time.strftime('%Y-%m-%d %H:%M:%S',
-                                  time.localtime(time0_+i))
+                q = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time0_+i))
                 Time.append(q)
             j = 'acf({f})'.format(f=timeseries_list[1])
             data = {'Time': Time, j: c}
