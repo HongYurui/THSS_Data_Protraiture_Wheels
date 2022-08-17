@@ -2,9 +2,21 @@ from FlokAlgorithmLocal import FlokAlgorithmLocal, FlokDataFrame
 import numpy as np
 import pandas as pd
 import time
-from datetime import datetime
 
 class acf(FlokAlgorithmLocal):
+    def run_acf(x,end_value):
+        len_x = len(x)
+        q = ([0]*len_x)
+        p = []
+        for i in range(len_x):
+            q = (x[i:len_x+1])
+            if len(q) < len_x:
+                q+=[0]*(len_x-len(q))
+            p.append(np.dot(q, x))
+        p.reverse()
+        for i in range(0, len_x-1):
+            p.append(p[len_x-2-i])
+        return list(p/end_value)
     def run(self, inputDataSets, params,time_=0):
         input_data = inputDataSets.get(0)
         timeseries = params.get("timeseries", None)
@@ -12,23 +24,17 @@ class acf(FlokAlgorithmLocal):
         if timeseries:
             timeseries_list = timeseries.split(',')
             output_data = input_data[timeseries_list]
-            
-            for i in range(len(output_data)):
-                if (datetime.strptime(output_data.Time[i], '%Y-%m-%d %H:%M:%S') 
-                <= datetime.strptime(time_, '%Y-%m-%d %H:%M:%S')):
-                    count+=1
+            time0=output_data['Time'][0]
+            time0_ = time.mktime(time.strptime(time0, '%Y-%m-%d %H:%M:%S'))
+            count = int(time.mktime(time.strptime(time_, '%Y-%m-%d %H:%M:%S'))-time0_)
             output_data.fillna(0, inplace=True)
             a = output_data[timeseries_list[1]][0:count]
-            c = np.correlate(a, a, mode='full') / \
-                output_data[timeseries_list[1]].values[count-1]
+            end_value=output_data[timeseries_list[1]].values[count-1]
+            c=acf.run_acf(list(a),end_value)
             Time = []
-            for i in range(1, 2*count):
-                if i < 10:
-                    q = time_[0:-1]+str(i)
-                    Time.append(q)
-                if i >= 10:
-                    q = time_[0:-2]+str(i)
-                    Time.append(q)
+            for i in range(0, 2*count-1):
+                q = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time0_+i))
+                Time.append(q)
             j = 'acf({f})'.format(f=timeseries_list[1])
             data = {'Time': Time, j: c}
             output_data = pd.DataFrame(data)
@@ -37,9 +43,7 @@ class acf(FlokAlgorithmLocal):
         result = FlokDataFrame()
         result.addDF(output_data)
         return result
-
-       
-        
+      
 
 if __name__ == "__main__":
     algorithm = acf()
@@ -74,7 +78,7 @@ if __name__ == "__main__":
         "output": ["./test_out_2.csv"],
         "outputFormat": ["csv"],
         "outputLocation": ["local_fs"],
-        "parameters": {"timeseries": "Time,root.test.d2.s2"}
+        "parameters": {"timeseries": "Time,root.test.d1.s1"}
     }
 
     params = all_info_2["parameters"]
