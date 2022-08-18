@@ -1,59 +1,131 @@
-from datetime import datetime, timedelta
-import re
-from time import time
 import pandas as pd
 from FlokAlgorithmLocal import FlokAlgorithmLocal, FlokDataFrame
 
 class Resample(FlokAlgorithmLocal):
     def run(self, inputDataSets, params):
         input_data = inputDataSets.get(0)
-        time_data = pd.Series([datetime.strptime(data, "%Y-%m-%d %H:%M:%S") for data in input_data.iloc[:, 0].values])
+        time_data = pd.Series([pd.to_datetime(data, format="%Y-%m-%d %H:%M:%S") for data in input_data.iloc[:, 0].values])
         value_data = input_data.iloc[:, 1].astype(float)
         
         # get parameters
         every = params.get("every")
         try:
             if every[-2:] == "ms":
-                freq = int(every[:-2])
+                period = float(every[:-2])
                 unit = "ms"
             else:
-                freq = int(every[:-1])
+                period = float(every[:-1])
                 unit = every[-1]
         except:
             raise Exception("Invalid parameter 'every'")
+            
         interp = params.get("interp", "NaN")
         aggr = params.get("aggr", "Mean")
-        start = params.get("start", next(time_data[i] for i in range(len(time_data)) if not pd.isnull(value_data[i])))
-        end = params.get("end", next(time_data[i] for i in range(len(time_data)-1,-1,-1) if not pd.isnull(value_data[i])))
+        left = next(time_data[i] for i in range(len(time_data)) if not pd.isnull(value_data[i]))
+        right = next(time_data[i] for i in range(len(time_data)-1,-1,-1) if not pd.isnull(value_data[i]))
+        start = pd.to_datetime(params.get('start'), format="%Y-%m-%d %H:%M:%S") if params.get('start') is not None else left
+        end = pd.to_datetime(params.get('end'), format="%Y-%m-%d %H:%M:%S") if params.get('end') is not None else right
         
         # unit conversion
         if unit == "ms":
-            freq *= 0.001
+            period *= 0.001
         elif unit == "m":
-            freq *= 60
+            period *= 60
         elif unit == "h":
-            freq *= 3600
+            period *= 3600
         elif unit == "d":
-            freq *= 3600 * 24
+            period *= 3600 * 24
         elif unit != "s":
             raise Exception("Invalid unit: " + unit)
         
-        prev_freq = (time_data.iloc[-1] - time_data[0]).seconds / (len(time_data) - 1)
-        output_data = pd.DataFrame(index=range(int((end - start).seconds / freq) + 1), columns=input_data.columns)
+        orig_period = (time_data.iloc[-1] - time_data[0]).seconds / (len(time_data) - 1)
+        output_data = pd.DataFrame(index=range(int((end - start).seconds / period) + 1), columns=input_data.columns)
+        timedelta = pd.Timedelta(seconds=period)
+        time_tol = pd.Timedelta(milliseconds=0.001)
         
-        # set timestamp
-        timedelta = pd.Timedelta(seconds=freq)
+        # resample function definitions
+        # upsample
+        if period <= orig_period:
+            if interp == "NaN":
+                def resample_func(timestamp, orig_idx):
+                    if time_data[orig_idx] < timestamp - time_tol:
+                        orig_idx += 1
+                    return orig_idx, value_data[orig_idx] if time_data[orig_idx] < timestamp + time_tol else pd.NA
+            elif interp == "FFill":
+                def resample_func(timestamp, orig_idx):
+                    if time_data[orig_idx] < timestamp + time_tol:
+                        orig_idx += 1
+                    return orig_idx, value_data[orig_idx - 1]
+            elif interp == "BFill":
+                def resample_func(timestamp, orig_idx):
+                    if time_data[orig_idx] < timestamp - time_tol:
+                        orig_idx += 1
+                    return orig_idx, value_data[orig_idx]
+            elif interp == "Linear":
+                def resample_func(timestamp, orig_idx):
+                    if time_data[orig_idx + 1] < timestamp - time_tol:
+                        orig_idx += 1
+                    return orig_idx, value_data[orig_idx] + (timestamp - time_data[orig_idx]).total_seconds() / orig_period * (value_data[orig_idx + 1] - value_data[orig_idx])
+            else:
+                raise Exception("Invalid parameter 'interp'")
+        # downsample
+        else:
+            if aggr == "Max":
+                def resample_func(timestamp, orig_idx):
+                    max = value_data[orig_idx]
+                    while time_data[orig_idx + 1] < timestamp:
+                        orig_idx += 1
+                        if value_data[orig_idx] > max:
+                            max = value_data[orig_idx]
+                    return orig_idx, max
+            elif aggr == "Min":
+                def resample_func(timestamp, orig_idx):
+                    min = value_data[orig_idx + 1]
+                    while time_data[orig_idx + 1] < timestamp:
+                        orig_idx += 1
+                        if value_data[orig_idx] < min:
+                            min = value_data[orig_idx]
+                    return orig_idx, min
+            elif aggr == "First":
+                def resample_func(timestamp, orig_idx):
+                    res = value_data[orig_idx + 1]
+                    while time_data[orig_idx + 1] < timestamp:
+                        orig_idx += 1
+                    return orig_idx, res
+            elif aggr == "Last":
+                def resample_func(timestamp, orig_idx):
+                    while time_data[orig_idx + 1] < timestamp:
+                        orig_idx += 1
+                    return orig_idx, value_data[orig_idx]
+            elif aggr == "Mean":
+                def resample_func(timestamp, orig_idx):
+                    sum = value_data[orig_idx]
+                    count = 1
+                    while time_data[orig_idx + 1] < timestamp:
+                        orig_idx += 1
+                        sum += value_data[orig_idx]
+                        count += 1
+                    return orig_idx, sum / count
+            elif aggr == "Median":
+                def resample_func(timestamp, orig_idx):
+                    data = []
+                    while time_data[orig_idx + 1] < timestamp:
+                        orig_idx += 1
+                        data.append(value_data[orig_idx])
+                    return orig_idx, pd.Series(data).median()
+            else:
+                raise Exception("Invalid parameter 'aggr'")
+
+        # resample
         timestamp = start
-        i = 0
-        while timestamp < end + pd.Timedelta(milliseconds=1e-6):
-            output_data.iloc[i, 0] = timestamp.strftime("%Y-%m-%d %H:%M:%S")
+        new_idx = 0
+        orig_idx = int((start - left).total_seconds() / orig_period)
+        while timestamp < end + time_tol:
+            output_data.iloc[new_idx, 0] = timestamp.strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
+            orig_idx, output_data.iloc[new_idx, 1] = resample_func(timestamp, orig_idx)
             timestamp += timedelta
-            i += 1
+            new_idx += 1
         
-        
-        
-        print(output_data)
-            
         result = FlokDataFrame()
         result.addDF(output_data)
         return result
@@ -68,7 +140,7 @@ if __name__ == "__main__":
         "output": ["./test_out_1.csv"],
         "outputFormat": ["csv"],
         "outputLocation": ["local_fs"],
-        "parameters": {'every': '2s', 'interp': 'linear'}
+        "parameters": {'every': '1.0s', 'interp': 'BFill', 'aggr': 'Min', "start": "2022-01-01 00:00:05", "end": "2022-01-01 00:00:20"}
     }
 
     params = all_info_1["parameters"]

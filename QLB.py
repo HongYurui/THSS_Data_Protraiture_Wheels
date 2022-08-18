@@ -5,14 +5,12 @@ from FlokAlgorithmLocal import FlokAlgorithmLocal, FlokDataFrame
 class QLB(FlokAlgorithmLocal):
     def run(self, inputDataSets, params):
         input_data = inputDataSets.get(0)
-        output_data = pd.DataFrame([[0] * input_data.shape[1]], index=range(1), columns=input_data.columns)
-        time_data = pd.Series([datetime.strptime(data, "%Y-%m-%d %H:%M:%S") for data in input_data.iloc[:, 0].values])
+        time_data = pd.Series([pd.to_datetime(data, format="%Y-%m-%d %H:%M:%S") for data in input_data.iloc[:, 0].values])
+        value_data = input_data.iloc[:, 1].astype(float)
+      
+        # to be implemented
+        output_data = input_data
         
-        # 
-        for column in range(1, input_data.shape[1]):
-            pass
-        
-        output_data.iloc[0, 0] = time_data[0].strftime("%Y-%m-%d 00:00:00")
         result = FlokDataFrame()
         result.addDF(output_data)
         return result
@@ -39,6 +37,8 @@ if __name__ == "__main__":
     outputLocation = all_info_1["outputLocation"]
 
     dataSet = algorithm.read(inputPaths, inputTypes, inputLocation, outputPaths, outputTypes)
+    from SelectTimeseries import SelectTimeseries
+    dataSet = SelectTimeseries().run(dataSet, {"timeseries": "Time,root.test.d2.s2"})
     result = algorithm.run(dataSet, params)
     algorithm.write(outputPaths, result, outputTypes, outputLocation)
 
