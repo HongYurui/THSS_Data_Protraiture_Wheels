@@ -1,54 +1,51 @@
 from FlokAlgorithmLocal import FlokAlgorithmLocal, FlokDataFrame
-import numpy as np
-import pandas as pd
 import time
+import numpy as np
+from scipy import interpolate
+import pandas as pd
+import matplotlib.pyplot as plt
+from datetime import datetime
 
-class acf(FlokAlgorithmLocal):
-    def run_acf(x,end_value):
-        len_x = len(x)
-        q = ([0]*len_x)
-        p = []
-        for i in range(len_x):
-            q = (x[i:len_x+1])
-            if len(q) < len_x:
-                q+=[0]*(len_x-len(q))
-            p.append(np.dot(q, x))
-        p.reverse()
-        for i in range(0, len_x-1):
-            p.append(p[len_x-2-i])
-        return list(p/end_value)
-    def run(self, inputDataSets, params,time_=0):
+
+class spline(FlokAlgorithmLocal):
+    def run(self, inputDataSets, params, points=0):
         input_data = inputDataSets.get(0)
         timeseries = params.get("timeseries", None)
-        count=0
         if timeseries:
             timeseries_list = timeseries.split(',')
             output_data = input_data[timeseries_list]
-            time0=output_data['Time'][0]
-            time0_ = time.mktime(time.strptime(time0, '%Y-%m-%d %H:%M:%S'))
-            count = int(time.mktime(time.strptime(time_, '%Y-%m-%d %H:%M:%S'))-time0_)
-            output_data.fillna(0, inplace=True)
-            a = output_data[timeseries_list[1]][0:count]
-            end_value=output_data[timeseries_list[1]].values[count-1]
-            c=acf.run_acf(list(a),end_value)
-            Time = []
-            for i in range(0, 2*count-1):
-                q = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time0_+i))
-                Time.append(q)
-            j = 'acf({f})'.format(f=timeseries_list[1])
-            data = {'Time': Time, j: c}
-            output_data = pd.DataFrame(data)
+            if len(output_data) >= 4:
+                column = timeseries_list[1]
+                #output_data[column] = output_data[column]**3
+                Time = []
+                time0 = time.mktime(time.strptime(
+                    output_data['Time'][0], "%Y-%m-%d %H:%M:%S"))
+                for i in range(len(output_data)):
+                    Time.append(time.mktime(time.strptime(
+                        output_data['Time'][i], "%Y-%m-%d %H:%M:%S"))-time0)
+                value = output_data[column]
+                # （t，c，k）包含节点向量、B样条曲线系数和样条曲线阶数的元组。
+                tck = interpolate.splrep(Time, value, k=3)
+                x = (np.linspace(min(Time), max(Time), points)).tolist()
+                y = (interpolate.splev(x, tck, der=0)).tolist()
+                for i in range(0, len(x)):
+                    x[i] = datetime.fromtimestamp(x[i]+time0)
+                j = 'spline({})'.format(column)
+                data = {'Time': x, j: y}
+                output_data = pd.DataFrame(data)
+                #plt.plot(x, y)
+                #plt.show()
+            else:
+                pass
         else:
             output_data = input_data
-        print(output_data)
         result = FlokDataFrame()
         result.addDF(output_data)
         return result
-      
+
 
 if __name__ == "__main__":
-    algorithm = acf()
-
+    algorithm = spline()
     all_info_1 = {
         "input": ["./test_in.csv"],
         "inputFormat": ["csv"],
@@ -71,7 +68,6 @@ if __name__ == "__main__":
                              inputLocation, outputPaths, outputTypes)
     result = algorithm.run(dataSet, params)
     algorithm.write(outputPaths, result, outputTypes, outputLocation)
-
     all_info_2 = {
         "input": ["./test_in.csv"],
         "inputFormat": ["csv"],
@@ -79,7 +75,7 @@ if __name__ == "__main__":
         "output": ["./test_out_2.csv"],
         "outputFormat": ["csv"],
         "outputLocation": ["local_fs"],
-        "parameters": {"timeseries": "Time,root.test.d1.s1"}
+        "parameters": {"timeseries": "Time,root.test.d2.s2"}
     }
 
     params = all_info_2["parameters"]
@@ -92,5 +88,5 @@ if __name__ == "__main__":
 
     dataSet = algorithm.read(inputPaths, inputTypes,
                              inputLocation, outputPaths, outputTypes)
-    result = algorithm.run(dataSet, params,'2022-01-01 00:00:05')
+    result = algorithm.run(dataSet, params, points=200)
     algorithm.write(outputPaths, result, outputTypes, outputLocation)
