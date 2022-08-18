@@ -51,7 +51,7 @@ class segment(FlokAlgorithmLocal):
                 del merge_cost[index + 1]
             else:
                 del merge_cost[index]
-            seg_piece[-2] = (seg_piece[-2] + seg_piece[-1])
+            seg_piece[-2] = segment.linear(seg_piece[-2] + seg_piece[-1])
         del seg_piece[-1]
         return seg_piece
     def run(self, inputDataSets, params,output='first',error=0.1):
