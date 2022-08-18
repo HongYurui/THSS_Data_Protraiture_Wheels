@@ -33,8 +33,8 @@ class spline(FlokAlgorithmLocal):
                 j = 'spline({})'.format(column)
                 data = {'Time': x, j: y}
                 output_data = pd.DataFrame(data)
-                plt.plot(x, y)
-                plt.show()
+                #plt.plot(x, y)
+                #plt.show()
             else:
                 pass
         else:
