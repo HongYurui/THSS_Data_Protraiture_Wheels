@@ -82,43 +82,43 @@ class Resample(FlokAlgorithmLocal):
             if aggr == "Max":
                 def resample_func(timestamp, orig_idx):
                     max = value_data[orig_idx]
-                    while time_data[orig_idx + 1] < timestamp:
+                    while time_data[orig_idx + 1] < timestamp + time_tol:
                         orig_idx += 1
                         if value_data[orig_idx] > max:
                             max = value_data[orig_idx]
-                    return orig_idx, max
+                    return orig_idx + 1, max
             elif aggr == "Min":
                 def resample_func(timestamp, orig_idx):
-                    min = value_data[orig_idx + 1]
-                    while time_data[orig_idx + 1] < timestamp:
+                    min = value_data[orig_idx]
+                    while time_data[orig_idx + 1] < timestamp + time_tol:
                         orig_idx += 1
                         if value_data[orig_idx] < min:
                             min = value_data[orig_idx]
-                    return orig_idx, min
+                    return orig_idx + 1, min
             elif aggr == "First":
                 def resample_func(timestamp, orig_idx):
-                    res = value_data[orig_idx + 1]
-                    while time_data[orig_idx + 1] < timestamp:
+                    res = value_data[orig_idx]
+                    while time_data[orig_idx + 1] < timestamp + time_tol:
                         orig_idx += 1
-                    return orig_idx, res
+                    return orig_idx + 1, res
             elif aggr == "Last":
                 def resample_func(timestamp, orig_idx):
-                    while time_data[orig_idx + 1] < timestamp:
+                    while time_data[orig_idx + 1] < timestamp + time_tol:
                         orig_idx += 1
-                    return orig_idx, value_data[orig_idx]
+                    return orig_idx + 1, value_data[orig_idx]
             elif aggr == "Mean":
                 def resample_func(timestamp, orig_idx):
                     sum = value_data[orig_idx]
                     count = 1
-                    while time_data[orig_idx + 1] < timestamp:
+                    while time_data[orig_idx + 1] < timestamp + time_tol:
+                        sum += value_data[orig_idx + 1]
                         orig_idx += 1
-                        sum += value_data[orig_idx]
                         count += 1
-                    return orig_idx, sum / count
+                    return orig_idx + 1, sum / count
             elif aggr == "Median":
                 def resample_func(timestamp, orig_idx):
-                    data = []
-                    while time_data[orig_idx + 1] < timestamp:
+                    data = [value_data[orig_idx]]
+                    while time_data[orig_idx + 1] < timestamp + time_tol:
                         orig_idx += 1
                         data.append(value_data[orig_idx])
                     return orig_idx, pd.Series(data).median()
@@ -134,7 +134,7 @@ class Resample(FlokAlgorithmLocal):
             orig_idx, output_data.iloc[new_idx, 1] = resample_func(timestamp, orig_idx)
             timestamp += timedelta
             new_idx += 1
-
+        print(output_data)
         result = FlokDataFrame()
         result.addDF(output_data)
         return result
@@ -149,7 +149,7 @@ if __name__ == "__main__":
         "output": ["./test_out_1.csv"],
         "outputFormat": ["csv"],
         "outputLocation": ["local_fs"],
-        "parameters": {'every': '1.0s', 'interp': 'BFill', 'aggr': 'Min', "start": "2022-01-01 00:00:05", "end": "2022-01-01 00:00:20"}
+        "parameters": {'every': '2.5s', 'interp': 'BFill', 'aggr': 'Min', "start": "2022-01-01 00:00:05", "end": "2022-01-01 00:00:20"}
     }
 
     params = all_info_1["parameters"]

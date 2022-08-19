@@ -2,6 +2,7 @@ from pandasql import sqldf
 from FlokAlgorithmLocal import FlokAlgorithmLocal, FlokDataFrame
 from SelectTimeseries import SelectTimeseries
 from Resample import Resample
+from Sample import Sample
 
 algorithm = Resample()
 
@@ -29,9 +30,17 @@ result = algorithm.run(input_data, params)
 algorithm.write(outputPaths, result, outputTypes, outputLocation)
 
 df = algorithm.run(input_data, params).next()
-resample = algorithm.run
+
+for func in ['resample', 'sample']:
+    globals()[func] = eval(func)
+    
+
+resample()
+    
+# def resample(**kwargs):
+#     algorithm.run(kwargs)
 
 # data_sql = sqldf("select Time, \"resample(root.test.d2.s2, 'every'='1.0s', 'interp'='BFill', 'aggr'='Min', 'start'='2022-01-01 00:00:05', 'end'='2022-01-01 00:00:20')\" from df;")
 
-data_sql = sqldf(input(">>> "))
-print(data_sql.head())
+# # data_sql = sqldf(input(">>> "))
+# print(data_sql.head())
