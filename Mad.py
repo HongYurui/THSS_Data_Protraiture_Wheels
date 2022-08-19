@@ -6,13 +6,15 @@ class Mad(FlokAlgorithmLocal):
     def run(self, inputDataSets, params):
         input_data = inputDataSets.get(0)
         output_data = pd.DataFrame([[0, 0]], index=range(1), columns=input_data.columns)
+
+        # calculation via pd.DataFrame.median()
         output_data.iloc[0, 0] = datetime.strptime(input_data.iloc[0, 0], "%Y-%m-%d %H:%M:%S").strftime("%Y-%m-%d 00:00:00")
         output_data.iloc[0, 1] = input_data.iloc[:, 1].astype(float).mad()
-        print(output_data)
+
         result = FlokDataFrame()
         result.addDF(output_data)
         return result
-        
+
 if __name__ == "__main__":
     algorithm = Mad()
 

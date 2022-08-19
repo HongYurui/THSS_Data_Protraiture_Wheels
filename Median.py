@@ -5,7 +5,7 @@ class Median(FlokAlgorithmLocal):
     def run(self, inputDataSets, params):
         input_data = inputDataSets.get(0)
         output_data = pd.DataFrame([[0, 0]], index=range(1), columns=input_data.columns)
-        
+
         # calculation via pd.DataFrame.median()
         output_data.iloc[0, 0] = pd.to_datetime(input_data.iloc[0, 0], format="%Y-%m-%d %H:%M:%S").strftime("%Y-%m-%d 00:00:00.000")
         output_data.iloc[0, 1] = input_data.iloc[:, 1].astype(float).median()
@@ -13,7 +13,7 @@ class Median(FlokAlgorithmLocal):
         result = FlokDataFrame()
         result.addDF(output_data)
         return result
-        
+
 if __name__ == "__main__":
     algorithm = Median()
 

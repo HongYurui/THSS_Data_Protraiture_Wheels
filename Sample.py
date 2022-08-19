@@ -5,13 +5,13 @@ from FlokAlgorithmLocal import FlokAlgorithmLocal, FlokDataFrame
 class Sample(FlokAlgorithmLocal):
     def run(self, inputDataSets, params):
         input_data = inputDataSets.get(0)
-        
+
         # get parameters
         method = params.get("method", "reservoir")
         k = params.get("k", 1)
 
         output_data = pd.DataFrame(index=range(k), columns=input_data.columns)
-        
+
         # reservoir sampling
         if method == "reservoir":
             for i in range(len(input_data)):
@@ -28,12 +28,11 @@ class Sample(FlokAlgorithmLocal):
                 output_data.iloc[i] = input_data.iloc[i * step]
         else:
             raise Exception("Invalid parameter 'method'")
-            
-        print(output_data)
+
         result = FlokDataFrame()
         result.addDF(output_data)
         return result
-        
+
 if __name__ == "__main__":
     algorithm = Sample()
 

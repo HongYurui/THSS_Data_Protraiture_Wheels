@@ -8,7 +8,7 @@ class Integral(FlokAlgorithmLocal):
         output_data = pd.DataFrame([[0, 0]], index=range(1), columns=input_data.columns)
         time_data = pd.Series([datetime.strptime(data, "%Y-%m-%d %H:%M:%S") for data in input_data.iloc[:, 0]])
         value_data = input_data.iloc[:, 1].astype(float)
-        
+
         # integration
         i = 0
         while i < len(value_data) - 1:
@@ -17,7 +17,7 @@ class Integral(FlokAlgorithmLocal):
                 j += 1
             output_data.iloc[0, 1] += (value_data[i] + value_data[j]) * (time_data[j] - time_data[i]).seconds / 2
             i = j
-        
+
         # time unit conversion
         unit = params.get("unit", "1s")
         if unit == "1S":
@@ -32,14 +32,14 @@ class Integral(FlokAlgorithmLocal):
             ratio = 3600 * 24
         else:
             raise Exception("Invalid unit: " + unit)
-        
-        output_data.iloc[0, 0] = time_data[0].strftime("%Y-%m-%d 00:00:00")
+
+        output_data.iloc[0, 0] = time_data[0].strftime("%Y-%m-%d 00:00:00.000")
         output_data.iloc[0, 1] /= ratio
-        print(output_data)
+
         result = FlokDataFrame()
         result.addDF(output_data)
         return result
-        
+
 if __name__ == "__main__":
     algorithm = Integral()
 
