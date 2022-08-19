@@ -2,7 +2,7 @@ from datetime import datetime
 import pandas as pd
 from FlokAlgorithmLocal import FlokAlgorithmLocal, FlokDataFrame
 
-class Mad(FlokAlgorithmLocal):
+class Median(FlokAlgorithmLocal):
     def run(self, inputDataSets, params):
         input_data = inputDataSets.get(0)
         output_data = pd.DataFrame([[0] * input_data.shape[1]], index=range(1), columns=input_data.columns)
@@ -18,7 +18,7 @@ class Mad(FlokAlgorithmLocal):
         return result
         
 if __name__ == "__main__":
-    algorithm = Mad()
+    algorithm = Median()
 
     all_info_1 = {
         "input": ["./test_in.csv"],
