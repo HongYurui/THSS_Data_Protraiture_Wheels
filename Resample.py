@@ -39,7 +39,6 @@ class Resample(FlokAlgorithmLocal):
         elif unit != "s":
             raise Exception("Invalid unit: " + unit)
 
-
         # header format
         value_header = 'resample(' + input_data.columns[1]
         param_list = ['every', 'interp', 'aggr', 'start', 'end']
