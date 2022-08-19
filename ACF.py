@@ -41,6 +41,7 @@ class acf(FlokAlgorithmLocal):
             output_data = pd.DataFrame(data)
         else:
             output_data = input_data
+        print(output_data)
         result = FlokDataFrame()
         result.addDF(output_data)
         return result

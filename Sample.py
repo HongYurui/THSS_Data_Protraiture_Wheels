@@ -1,22 +1,40 @@
-from datetime import datetime
 import pandas as pd
+import random
 from FlokAlgorithmLocal import FlokAlgorithmLocal, FlokDataFrame
 
-class Mad(FlokAlgorithmLocal):
+class Sample(FlokAlgorithmLocal):
     def run(self, inputDataSets, params):
         input_data = inputDataSets.get(0)
-        output_data = pd.DataFrame([[0, 0]], index=range(1), columns=input_data.columns)
 
-        # calculation via pd.DataFrame.median()
-        output_data.iloc[0, 0] = datetime.strptime(input_data.iloc[0, 0], "%Y-%m-%d %H:%M:%S").strftime("%Y-%m-%d 00:00:00")
-        output_data.iloc[0, 1] = input_data.iloc[:, 1].astype(float).mad()
+        # get parameters
+        method = params.get("method", "reservoir")
+        k = params.get("k", 1)
+
+        output_data = pd.DataFrame(index=range(k), columns=input_data.columns)
+
+        # reservoir sampling
+        if method == "reservoir":
+            for i in range(len(input_data)):
+                if i < k:
+                    output_data.iloc[i] = input_data.iloc[i]
+                else:
+                    random_int = random.randint(0, i)
+                    if random_int < k:
+                        output_data.iloc[random_int] = input_data.iloc[i]
+        # isometric sampling
+        elif method == "isometric":
+            step = int(len(input_data) / k)
+            for i in range(k):
+                output_data.iloc[i] = input_data.iloc[i * step]
+        else:
+            raise Exception("Invalid parameter 'method'")
 
         result = FlokDataFrame()
         result.addDF(output_data)
         return result
 
 if __name__ == "__main__":
-    algorithm = Mad()
+    algorithm = Sample()
 
     all_info_1 = {
         "input": ["./test_in.csv"],
@@ -25,7 +43,7 @@ if __name__ == "__main__":
         "output": ["./test_out_1.csv"],
         "outputFormat": ["csv"],
         "outputLocation": ["local_fs"],
-        "parameters": {}
+        "parameters": {"method": "reservoir", "k": 5}
     }
 
     params = all_info_1["parameters"]
@@ -49,7 +67,7 @@ if __name__ == "__main__":
     #     "output": ["./test_out_2.csv"],
     #     "outputFormat": ["csv"],
     #     "outputLocation": ["local_fs"],
-    #     "parameters": {}
+    #     "parameters": {"timeseries": "Time,root.test.d2.s2"}
     # }
 
     # params = all_info_2["parameters"]
