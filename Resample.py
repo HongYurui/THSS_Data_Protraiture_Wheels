@@ -6,6 +6,8 @@ class Resample(FlokAlgorithmLocal):
         input_data = inputDataSets.get(0)
         time_data = pd.Series([pd.to_datetime(data, format="%Y-%m-%d %H:%M:%S") for data in input_data.iloc[:, 0].values])
         value_data = input_data.iloc[:, 1].astype(float)
+        left = next(time_data[i] for i in range(len(time_data)) if not pd.isnull(value_data[i]))
+        right = next(time_data[i] for i in range(len(time_data)-1,-1,-1) if not pd.isnull(value_data[i]))
 
         # get parameters
         every = params.get("every")
@@ -21,10 +23,9 @@ class Resample(FlokAlgorithmLocal):
 
         interp = params.get("interp", "NaN")
         aggr = params.get("aggr", "Mean")
-        left = next(time_data[i] for i in range(len(time_data)) if not pd.isnull(value_data[i]))
-        right = next(time_data[i] for i in range(len(time_data)-1,-1,-1) if not pd.isnull(value_data[i]))
         start = pd.to_datetime(params.get('start'), format="%Y-%m-%d %H:%M:%S") if params.get('start') is not None else left
         end = pd.to_datetime(params.get('end'), format="%Y-%m-%d %H:%M:%S") if params.get('end') is not None else right
+        orig_period = (time_data.iloc[-1] - time_data[0]).seconds / (len(time_data) - 1)
 
         # unit conversion
         if unit == "ms":
@@ -38,8 +39,17 @@ class Resample(FlokAlgorithmLocal):
         elif unit != "s":
             raise Exception("Invalid unit: " + unit)
 
-        orig_period = (time_data.iloc[-1] - time_data[0]).seconds / (len(time_data) - 1)
-        output_data = pd.DataFrame(index=range(int((end - start).seconds / period) + 1), columns=input_data.columns)
+
+        # header format
+        value_header = 'resample(' + input_data.columns[1]
+        param_list = ['every', 'interp', 'aggr', 'start', 'end']
+        for param in param_list:
+            if param in params:
+                value_header += ', \'' + param + '\'=\'' + str(params[param]) + '\''
+        value_header += ')'
+
+        output_data = pd.DataFrame(index=range(int((end - start).seconds / period) + 1), columns=['Time', value_header])
+
         timedelta = pd.Timedelta(seconds=period)
         time_tol = pd.Timedelta(milliseconds=0.001)
 

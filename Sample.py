@@ -36,7 +36,7 @@ class Sample(FlokAlgorithmLocal):
                 output_data.iloc[i] = input_data.iloc[i * step]
         else:
             raise Exception("Invalid parameter 'method'")
-        print(output_data)
+
         result = FlokDataFrame()
         result.addDF(output_data)
         return result
