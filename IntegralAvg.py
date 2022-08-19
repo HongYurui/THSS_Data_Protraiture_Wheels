@@ -1,55 +1,20 @@
 import pandas as pd
 from FlokAlgorithmLocal import FlokAlgorithmLocal, FlokDataFrame
+from Integral import Integral
 
-class Integral(FlokAlgorithmLocal):
+class IntegralAvg(FlokAlgorithmLocal):
     def run(self, inputDataSets, params):
         input_data = inputDataSets.get(0)
-        
-        # header format
-        value_header = 'integral(' + input_data.columns[1]
-        param_list = ['unit']
-        for param in param_list:
-            if param in params:
-                value_header += ', \'' + param + '\'=\'' + str(params[param]) + '\''
-        value_header += ')'
-        
-        output_data = pd.DataFrame([[0, 0]], index=range(1), columns=['Time', value_header])
-        time_data = pd.Series([pd.to_datetime(data, format="%Y-%m-%d %H:%M:%S") for data in input_data.iloc[:, 0]])
-        value_data = input_data.iloc[:, 1].astype(float)
-
-        # integration
-        i = 0
-        while i < len(value_data) - 1:
-            j = i + 1
-            while pd.isnull(value_data[j]):
-                j += 1
-            output_data.iloc[0, 1] += (value_data[i] + value_data[j]) * (time_data[j] - time_data[i]).seconds / 2
-            i = j
-
-        # time unit conversion
-        unit = params.get("unit", "1s")
-        if unit == "1S":
-            ratio = 0.001
-        elif unit == "1s":
-            ratio = 1
-        elif unit == "1m":
-            ratio = 60
-        elif unit == "1h":
-            ratio = 3600
-        elif unit == "1d":
-            ratio = 3600 * 24
-        else:
-            raise Exception("Invalid unit: " + unit)
-
-        output_data.iloc[0, 0] = time_data[0].strftime("%Y-%m-%d 00:00:00.000")
-        output_data.iloc[0, 1] /= ratio
+        integral_frame = Integral().run(inputDataSets, params).get(0)
+        timespan = (pd.to_datetime(input_data.iloc[-1, 0]) - pd.to_datetime(input_data.iloc[0, 0])).total_seconds()
+        output_data = pd.DataFrame([[integral_frame.iloc[0, 0], integral_frame.iloc[0, 1] / timespan]], index=range(1), columns=['Time', "integralavg" + integral_frame.columns[1][8:]])
 
         result = FlokDataFrame()
         result.addDF(output_data)
         return result
 
 if __name__ == "__main__":
-    algorithm = Integral()
+    algorithm = IntegralAvg()
 
     all_info_1 = {
         "input": ["./test_in.csv"],
