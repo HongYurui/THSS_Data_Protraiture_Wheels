@@ -2,7 +2,7 @@ from FlokAlgorithmLocal import FlokAlgorithmLocal, FlokDataFrame
 import pandas as pd
 
 class histogram(FlokAlgorithmLocal):
-    def run(self, inputDataSets, params, min=0, max_=0, count=1):
+    def run(self, inputDataSets, params):
         input_data = inputDataSets.get(0)
         timeseries = params.get("timeseries", None)
         if timeseries:
@@ -10,21 +10,15 @@ class histogram(FlokAlgorithmLocal):
             output_data = input_data[timeseries_list]
             column=timeseries_list[1]
             max_value = max(output_data[column])
-            if min:
-                pass
-            else:
-                min = -max_value
-            if max_:
-                pass
-            else:
-                max_ = max_value
+            min = params.get("min", -max_value)
+            max_ = params.get("max_", max_value)
+            count = params.get("count", 1)
             bucket = [0]*count
             Time = []
             for j in range(len(output_data[column])):
                 if output_data[column][j] < min:
                     bucket[0] += 1
                 elif output_data[column][j] >= max_:
-                    # print(output_data[column][j])
                     bucket[-1] += 1
                 else:
                     for i in range(1, count+1):
@@ -75,7 +69,7 @@ if __name__ == "__main__":
         "output": ["./test_out_2.csv"],
         "outputFormat": ["csv"],
         "outputLocation": ["local_fs"],
-        "parameters": {"timeseries": "Time,root.test.d1.s1"}
+        "parameters": {"timeseries": "Time,root.test.d2.s2",'min':1,'max_':20,'count':10}
     }
 
     params = all_info_2["parameters"]
@@ -88,5 +82,5 @@ if __name__ == "__main__":
 
     dataSet = algorithm.read(inputPaths, inputTypes,
                              inputLocation, outputPaths, outputTypes)
-    result = algorithm.run(dataSet, params,min=1,max_=20,count=10)
+    result = algorithm.run(dataSet, params)
     algorithm.write(outputPaths, result, outputTypes, outputLocation)
