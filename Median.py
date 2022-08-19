@@ -4,7 +4,16 @@ from FlokAlgorithmLocal import FlokAlgorithmLocal, FlokDataFrame
 class Median(FlokAlgorithmLocal):
     def run(self, inputDataSets, params):
         input_data = inputDataSets.get(0)
-        output_data = pd.DataFrame([[0, 0]], index=range(1), columns=input_data.columns)
+        
+        # header format
+        value_header = 'median(' + input_data.columns[1]
+        param_list = ['error']
+        for param in param_list:
+            if param in params:
+                value_header += ', \'' + param + '\'=\'' + str(params[param]) + '\''
+        value_header += ')'
+
+        output_data = pd.DataFrame([[0, 0]], index=range(1), columns=['Time', value_header])
 
         # calculation via pd.DataFrame.median()
         output_data.iloc[0, 0] = pd.to_datetime(input_data.iloc[0, 0], format="%Y-%m-%d %H:%M:%S").strftime("%Y-%m-%d 00:00:00.000")
@@ -24,7 +33,7 @@ if __name__ == "__main__":
         "output": ["./test_out_1.csv"],
         "outputFormat": ["csv"],
         "outputLocation": ["local_fs"],
-        "parameters": {"unit": "1S"}
+        "parameters": {"error": 0.01}
     }
 
     params = all_info_1["parameters"]

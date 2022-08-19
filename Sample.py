@@ -10,7 +10,15 @@ class Sample(FlokAlgorithmLocal):
         method = params.get("method", "reservoir")
         k = params.get("k", 1)
 
-        output_data = pd.DataFrame(index=range(k), columns=input_data.columns)
+        # header format
+        value_header = 'sample(' + input_data.columns[1]
+        param_list = ['method', 'k']
+        for param in param_list:
+            if param in params:
+                value_header += ', \'' + param + '\'=\'' + str(params[param]) + '\''
+        value_header += ')'
+
+        output_data = pd.DataFrame(index=range(k), columns=['Time', value_header])
 
         # reservoir sampling
         if method == "reservoir":
@@ -28,7 +36,7 @@ class Sample(FlokAlgorithmLocal):
                 output_data.iloc[i] = input_data.iloc[i * step]
         else:
             raise Exception("Invalid parameter 'method'")
-
+        print(output_data)
         result = FlokDataFrame()
         result.addDF(output_data)
         return result

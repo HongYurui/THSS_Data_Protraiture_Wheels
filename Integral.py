@@ -1,11 +1,21 @@
 from datetime import datetime
+from re import I
 import pandas as pd
 from FlokAlgorithmLocal import FlokAlgorithmLocal, FlokDataFrame
 
 class Integral(FlokAlgorithmLocal):
     def run(self, inputDataSets, params):
         input_data = inputDataSets.get(0)
-        output_data = pd.DataFrame([[0, 0]], index=range(1), columns=input_data.columns)
+        
+        # header format
+        value_header = 'integral(' + input_data.columns[1]
+        param_list = ['unit']
+        for param in param_list:
+            if param in params:
+                value_header += ', \'' + param + '\'=\'' + str(params[param]) + '\''
+        value_header += ')'
+        
+        output_data = pd.DataFrame([[0, 0]], index=range(1), columns=['Time', value_header])
         time_data = pd.Series([datetime.strptime(data, "%Y-%m-%d %H:%M:%S") for data in input_data.iloc[:, 0]])
         value_data = input_data.iloc[:, 1].astype(float)
 
