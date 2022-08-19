@@ -6,7 +6,7 @@ class Resample(FlokAlgorithmLocal):
         input_data = inputDataSets.get(0)
         time_data = pd.Series([pd.to_datetime(data, format="%Y-%m-%d %H:%M:%S") for data in input_data.iloc[:, 0].values])
         value_data = input_data.iloc[:, 1].astype(float)
-        
+
         # get parameters
         every = params.get("every")
         try:
@@ -18,14 +18,14 @@ class Resample(FlokAlgorithmLocal):
                 unit = every[-1]
         except:
             raise Exception("Invalid parameter 'every'")
-            
+
         interp = params.get("interp", "NaN")
         aggr = params.get("aggr", "Mean")
         left = next(time_data[i] for i in range(len(time_data)) if not pd.isnull(value_data[i]))
         right = next(time_data[i] for i in range(len(time_data)-1,-1,-1) if not pd.isnull(value_data[i]))
         start = pd.to_datetime(params.get('start'), format="%Y-%m-%d %H:%M:%S") if params.get('start') is not None else left
         end = pd.to_datetime(params.get('end'), format="%Y-%m-%d %H:%M:%S") if params.get('end') is not None else right
-        
+
         # unit conversion
         if unit == "ms":
             period *= 0.001
@@ -37,12 +37,12 @@ class Resample(FlokAlgorithmLocal):
             period *= 3600 * 24
         elif unit != "s":
             raise Exception("Invalid unit: " + unit)
-        
+
         orig_period = (time_data.iloc[-1] - time_data[0]).seconds / (len(time_data) - 1)
         output_data = pd.DataFrame(index=range(int((end - start).seconds / period) + 1), columns=input_data.columns)
         timedelta = pd.Timedelta(seconds=period)
         time_tol = pd.Timedelta(milliseconds=0.001)
-        
+
         # resample function definitions
         # upsample
         if period <= orig_period:
@@ -125,11 +125,11 @@ class Resample(FlokAlgorithmLocal):
             orig_idx, output_data.iloc[new_idx, 1] = resample_func(timestamp, orig_idx)
             timestamp += timedelta
             new_idx += 1
-        
+
         result = FlokDataFrame()
         result.addDF(output_data)
         return result
-        
+
 if __name__ == "__main__":
     algorithm = Resample()
 
