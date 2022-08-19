@@ -33,10 +33,10 @@ df = algorithm.run(input_data, params).next()
 
 for func in ['resample', 'sample']:
     globals()[func] = eval(func)
-    
+
 
 resample()
-    
+
 # def resample(**kwargs):
 #     algorithm.run(kwargs)
 

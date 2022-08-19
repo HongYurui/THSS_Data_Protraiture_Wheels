@@ -134,7 +134,7 @@ class Resample(FlokAlgorithmLocal):
             orig_idx, output_data.iloc[new_idx, 1] = resample_func(timestamp, orig_idx)
             timestamp += timedelta
             new_idx += 1
-        print(output_data)
+
         result = FlokDataFrame()
         result.addDF(output_data)
         return result
