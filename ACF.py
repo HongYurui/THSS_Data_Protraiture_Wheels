@@ -17,13 +17,14 @@ class acf(FlokAlgorithmLocal):
         for i in range(0, len_x-1):
             p.append(p[len_x-2-i])
         return list(p/end_value)
-    def run(self, inputDataSets, params,time_=0):
+    def run(self, inputDataSets, params):
         input_data = inputDataSets.get(0)
         timeseries = params.get("timeseries", None)
         count=0
         if timeseries:
             timeseries_list = timeseries.split(',')
             output_data = input_data[timeseries_list]
+            time_ = params.get("time_", None)
             time0=output_data['Time'][0]
             time0_ = time.mktime(time.strptime(time0, '%Y-%m-%d %H:%M:%S'))
             count = int(time.mktime(time.strptime(time_, '%Y-%m-%d %H:%M:%S'))-time0_)
@@ -79,7 +80,7 @@ if __name__ == "__main__":
         "output": ["./test_out_2.csv"],
         "outputFormat": ["csv"],
         "outputLocation": ["local_fs"],
-        "parameters": {"timeseries": "Time,root.test.d1.s1"}
+        "parameters": {"timeseries": "Time,root.test.d1.s1", 'time_': '2022-01-01 00:00:05'}
     }
 
     params = all_info_2["parameters"]
@@ -92,5 +93,5 @@ if __name__ == "__main__":
 
     dataSet = algorithm.read(inputPaths, inputTypes,
                              inputLocation, outputPaths, outputTypes)
-    result = algorithm.run(dataSet, params,'2022-01-01 00:00:05')
+    result = algorithm.run(dataSet, params)
     algorithm.write(outputPaths, result, outputTypes, outputLocation)

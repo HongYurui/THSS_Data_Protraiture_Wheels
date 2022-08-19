@@ -51,10 +51,10 @@ class segment(FlokAlgorithmLocal):
                 del merge_cost[index + 1]
             else:
                 del merge_cost[index]
-            seg_piece[-2] = segment.linear(seg_piece[-2] + seg_piece[-1])
+        seg_piece[-2] = segment.linear(seg_piece[-2] + seg_piece[-1])
         del seg_piece[-1]
         return seg_piece
-    def run(self, inputDataSets, params,output='first',error=0.1):
+    def run(self, inputDataSets, params):
         input_data = inputDataSets.get(0)
         timeseries = params.get("timeseries", None)
         if timeseries:
@@ -62,6 +62,8 @@ class segment(FlokAlgorithmLocal):
             output_data = input_data[timeseries_list]
             column = timeseries_list[1]
             str_='segment({a},error={b})'.format(a=column,b=error)
+            output = params.get("output", 'first')
+            error = params.get("error", 0.1)
             if all([((output_data[column][i] - output_data[column][i-1])-(output_data[column][1] - output_data[column][0]))<1e-10 for i in range(1,len(output_data))]):
                 if output == 'all':
                     output_data=output_data
@@ -121,7 +123,7 @@ if __name__ == "__main__":
         "output": ["./test_out_2.csv"],
         "outputFormat": ["csv"],
         "outputLocation": ["local_fs"],
-        "parameters": {"timeseries": "Time,root.test.d2.s2"}
+        "parameters": {"timeseries": "Time,root.test.d2.s2",'output':'first','error':0.1}
     }
 
     params = all_info_2["parameters"]

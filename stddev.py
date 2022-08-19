@@ -3,20 +3,8 @@ import math
 import pandas as pd
 
 
-class SelectTimeseries(FlokAlgorithmLocal):
+class stddev(FlokAlgorithmLocal):
     def run(self, inputDataSets, params):
-        input_data = inputDataSets.get(0)
-        timeseries = params.get("timeseries", None)
-        if timeseries:
-            timeseries_list = timeseries.split(',')
-            output_data = input_data[timeseries_list]
-        else:
-            output_data = input_data
-        result = FlokDataFrame()
-        result.addDF(output_data)
-        return result
-
-    def stddev(self, inputDataSets, params):
         input_data = inputDataSets.get(0)
         timeseries = params.get("timeseries", None)
         if timeseries:
@@ -28,7 +16,7 @@ class SelectTimeseries(FlokAlgorithmLocal):
             std = math.sqrt(sum((output_data[column]-mean) **
                             2)/len(output_data[column]))
             j = 'stddev({})'.format(column)
-            data = {'Time': output_data['Time'][0], j: std}
+            data = {'Time': '1970-01-01 08:00:00.000', j: std}
             output_data = pd.DataFrame(data, index=[0])
         else:
             output_data = input_data
@@ -38,7 +26,7 @@ class SelectTimeseries(FlokAlgorithmLocal):
 
 
 if __name__ == "__main__":
-    algorithm = SelectTimeseries()
+    algorithm = stddev()
 
     all_info_1 = {
         "input": ["./test_in.csv"],
@@ -83,5 +71,5 @@ if __name__ == "__main__":
 
     dataSet = algorithm.read(inputPaths, inputTypes,
                              inputLocation, outputPaths, outputTypes)
-    result = algorithm.stddev(dataSet, params)
+    result = algorithm.run(dataSet, params)
     algorithm.write(outputPaths, result, outputTypes, outputLocation)

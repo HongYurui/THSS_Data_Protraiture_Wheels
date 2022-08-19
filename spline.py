@@ -8,12 +8,13 @@ from datetime import datetime
 
 
 class spline(FlokAlgorithmLocal):
-    def run(self, inputDataSets, params, points=0):
+    def run(self, inputDataSets, params):
         input_data = inputDataSets.get(0)
         timeseries = params.get("timeseries", None)
         if timeseries:
             timeseries_list = timeseries.split(',')
             output_data = input_data[timeseries_list]
+            points = params.get("points", None)
             if len(output_data) >= 4:
                 column = timeseries_list[1]
                 #output_data[column] = output_data[column]**3
@@ -75,7 +76,7 @@ if __name__ == "__main__":
         "output": ["./test_out_2.csv"],
         "outputFormat": ["csv"],
         "outputLocation": ["local_fs"],
-        "parameters": {"timeseries": "Time,root.test.d2.s2"}
+        "parameters": {"timeseries": "Time,root.test.d2.s2",'points':200}
     }
 
     params = all_info_2["parameters"]
@@ -88,5 +89,5 @@ if __name__ == "__main__":
 
     dataSet = algorithm.read(inputPaths, inputTypes,
                              inputLocation, outputPaths, outputTypes)
-    result = algorithm.run(dataSet, params, points=200)
+    result = algorithm.run(dataSet, params)
     algorithm.write(outputPaths, result, outputTypes, outputLocation)
