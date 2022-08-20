@@ -21,7 +21,6 @@ class Integral(FlokAlgorithmLocal):
         i = 0
         while pd.isnull(value_data[i]):
             i += 1
-
         while i < len(value_data) - 1:
             j = i + 1
             while pd.isnull(value_data[j]):
