@@ -4,7 +4,7 @@ from FlokAlgorithmLocal import FlokAlgorithmLocal, FlokDataFrame
 class Integral(FlokAlgorithmLocal):
     def run(self, inputDataSets, params):
         input_data = inputDataSets.get(0)
-        
+
         # header format
         value_header = 'integral(' + input_data.columns[1]
         param_list = ['unit']
@@ -12,13 +12,16 @@ class Integral(FlokAlgorithmLocal):
             if param in params:
                 value_header += ', \'' + param + '\'=\'' + str(params[param]) + '\''
         value_header += ')'
-        
+
         output_data = pd.DataFrame([[0, 0]], index=range(1), columns=['Time', value_header])
         time_data = pd.Series([pd.to_datetime(data, format="%Y-%m-%d %H:%M:%S") for data in input_data.iloc[:, 0]])
         value_data = input_data.iloc[:, 1].astype(float)
 
         # integration
         i = 0
+        while pd.isnull(value_data[i]):
+            i += 1
+
         while i < len(value_data) - 1:
             j = i + 1
             while pd.isnull(value_data[j]):

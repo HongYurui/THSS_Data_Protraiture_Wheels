@@ -6,7 +6,13 @@ class IntegralAvg(FlokAlgorithmLocal):
     def run(self, inputDataSets, params):
         input_data = inputDataSets.get(0)
         integral_frame = Integral().run(inputDataSets, params).get(0)
-        timespan = (pd.to_datetime(input_data.iloc[-1, 0]) - pd.to_datetime(input_data.iloc[0, 0])).total_seconds()
+        start = pd.to_datetime(input_data.iloc[0, 0])
+        end = pd.to_datetime(input_data.iloc[-1, 0])
+        while pd.isnull(start):
+            start += 1
+        while pd.isnull(end):
+            end -= 1
+        timespan = (end - start).total_seconds()
         output_data = pd.DataFrame([[integral_frame.iloc[0, 0], integral_frame.iloc[0, 1] / timespan]], index=range(1), columns=['Time', "integralavg" + integral_frame.columns[1][8:]])
 
         result = FlokDataFrame()
