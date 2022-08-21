@@ -143,13 +143,13 @@ if __name__ == "__main__":
     algorithm = Resample()
 
     all_info_1 = {
-        "input": ["./test_in.csv"],
+        "input": ["root_test_d1"],
         "inputFormat": ["csv"],
         "inputLocation": ["local_fs"],
         "output": ["./test_out_1.csv"],
         "outputFormat": ["csv"],
         "outputLocation": ["local_fs"],
-        "parameters": {'every': '2.5s', 'interp': 'BFill', 'aggr': 'Min', "start": "2022-01-01 00:00:05", "end": "2022-01-01 00:00:20"}
+        "parameters": {'every': '1.0s', 'interp': 'BFill', 'aggr': 'Min', "start": "2022-01-01 00:00:02", "end": "2022-01-01 00:00:08"}
     }
 
     params = all_info_1["parameters"]
@@ -162,7 +162,7 @@ if __name__ == "__main__":
 
     dataSet = algorithm.read(inputPaths, inputTypes, inputLocation, outputPaths, outputTypes)
     from SelectTimeseries import SelectTimeseries
-    dataSet = SelectTimeseries().run(dataSet, {"timeseries": "Time,root.test.d2.s2"})
+    dataSet = SelectTimeseries().run(dataSet, {"timeseries": "Time,s2"})
     result = algorithm.run(dataSet, params)
     algorithm.write(outputPaths, result, outputTypes, outputLocation)
 

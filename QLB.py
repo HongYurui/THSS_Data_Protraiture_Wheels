@@ -1,15 +1,16 @@
 import pandas as pd
 from FlokAlgorithmLocal import FlokAlgorithmLocal, FlokDataFrame
+from ACF import acf
 
 class QLB(FlokAlgorithmLocal):
     def run(self, inputDataSets, params):
         input_data = inputDataSets.get(0)
         time_data = pd.Series([pd.to_datetime(data, format="%Y-%m-%d %H:%M:%S") for data in input_data.iloc[:, 0].values])
         value_data = input_data.iloc[:, 1].astype(float)
-        len_data = len(time_data)
+        n = len(time_data)
 
         # get lag
-        lag = params.get("lag", len_data - 2)
+        lag = params.get("lag", n - 2)
 
         # header format
         value_header = 'QLB(' + input_data.columns[1]
@@ -23,11 +24,16 @@ class QLB(FlokAlgorithmLocal):
         output_data = pd.DataFrame(index=range(lag), columns=['Time', value_header])
         timestamp = time_data[0]
         timedelta = pd.to_timedelta(0.001, unit="s")
+        print(acf().run(inputDataSets, {}).get(0).iloc[:-2, 1])
+        square_acf = [x ** 2 / (n - i - 1) for i, x in enumerate(acf().run(inputDataSets, {}).get(0).iloc[:-2, 1])]
+        # print(square_acf)
+        
         for i in range(lag):
             timestamp += timedelta
             output_data.iloc[i, 0] = timestamp.strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
-            output_data.iloc[i, 1] = value_data.iloc[i + 1] - value_data.iloc[i]
-
+            # LB Q-test
+            output_data.iloc[i, 1] = n * (n + 2) * sum(square_acf[:i + 1])
+        print(output_data)
         result = FlokDataFrame()
         result.addDF(output_data)
         return result
@@ -36,13 +42,13 @@ if __name__ == "__main__":
     algorithm = QLB()
 
     all_info_1 = {
-        "input": ["./test_in.csv"],
+        "input": ["./test_in copy.csv"],
         "inputFormat": ["csv"],
         "inputLocation": ["local_fs"],
         "output": ["./test_out_1.csv"],
         "outputFormat": ["csv"],
         "outputLocation": ["local_fs"],
-        "parameters": {"lag": 3}
+        "parameters": {"lag": 18}
     }
 
     params = all_info_1["parameters"]

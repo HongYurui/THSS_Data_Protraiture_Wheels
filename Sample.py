@@ -9,6 +9,8 @@ class Sample(FlokAlgorithmLocal):
         # get parameters
         method = params.get("method", "reservoir")
         k = params.get("k", 1)
+        if isinstance(k, str):
+            k = int(k)
 
         # header format
         value_header = 'sample(' + input_data.columns[1]

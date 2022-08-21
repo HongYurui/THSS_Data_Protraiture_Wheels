@@ -1,46 +1,61 @@
+import re
+from pandas import merge
 from pandasql import sqldf
-from FlokAlgorithmLocal import FlokAlgorithmLocal, FlokDataFrame
-from SelectTimeseries import SelectTimeseries
+from FlokAlgorithmLocal import FlokDataFrame
+from Integral import Integral
+from Mad import Mad
+from Median import Median
 from Resample import Resample
 from Sample import Sample
 
-algorithm = Resample()
+inputTypes = ['csv']
+inputLocation = ['local_fs']
+outputPaths = ['./test_out.csv']
+outputTypes = ['csv']
 
-all_info_1 = {
-    "input": ["./test_in.csv"],
-    "inputFormat": ["csv"],
-    "inputLocation": ["local_fs"],
-    "output": ["./test_out_1.csv"],
-    "outputFormat": ["csv"],
-    "outputLocation": ["local_fs"],
-    "parameters": {'every': '1.0s', 'interp': 'BFill', 'aggr': 'Min', "start": "2022-01-01 00:00:05", "end": "2022-01-01 00:00:20"}
-}
+while True:
+    command = input(">>> ")
+    ## constant commands for debugging
+    # command = "select Time, \"resample(s2, 'every'='1.0s', 'interp'='BFill', 'aggr'='Min', 'start'='2022-01-01 00:00:02', 'end'='2022-01-01 00:00:08')\" from root_test_d1 where Time <= '2022-01-01 00:00:12';"
+    # command = "select Time, \"sample(s3, 'method'='isometric', 'k'='5')\" from root_test_d1 where Time <= '2022-01-01 00:00:12';"
+    # command = "select Time, \"median(s1)\" from root_test_d1 where Time <= '2022-01-01 00:00:12';"
+    if command in ["exit", "quit", "q"]:
+        break
+    elif command in ["help", "h"]:
+        print("""
+        exit, quit, q: exit
+        help, h: print this help
+        select timeseries from dataframe [where condition]: perform a SQL query
+        """)
+    else:
+        try:
+            # preprocess the command by extracting patterns
+            pattern = re.findall(r"select\s+\w+,\s+\"(\w+)\((\w+),\s+(.*)\)\"\s+from\s+(.*?)[\s;]+.*", command)[0]
+            print(pattern)
+            funcName = pattern[0].capitalize()
+            params = dict(re.findall(r"\'(\w+)\'\s*=\s*\'([\w\s\-\.:]+)\'", pattern[2]))
+            if funcName == 'Sample' and params.get('method') == 'reservoir':
+                raise Exception("Sample method 'reservoir' is not supported in SQL query due to the randomness.")
+            inputPath = pattern[3]
+            inputPaths = [inputPath]
 
-params = all_info_1["parameters"]
-inputPaths = all_info_1["input"]
-inputTypes = all_info_1["inputFormat"]
-inputLocation = all_info_1["inputLocation"]
-outputPaths = all_info_1["output"]
-outputTypes = all_info_1["outputFormat"]
-outputLocation = all_info_1["outputLocation"]
+            # run the algorithm
+            algorithm = globals()[funcName]()
+            data = algorithm.read(inputPaths, inputTypes, inputLocation, outputPaths, outputTypes).get(0)
+            for series in data.columns[1:]:
+                flokdataframe = FlokDataFrame()
+                flokdataframe.addDF(data.loc[:, ['Time', series]])
+                dataframe = algorithm.run(flokdataframe, params).get(0)
+                if inputPath not in globals().keys():
+                    globals()[inputPath] = dataframe
+                else:
+                    globals()[inputPath] = merge(globals()[inputPath], dataframe, on='Time')
 
-dataSet = algorithm.read(inputPaths, inputTypes, inputLocation, outputPaths, outputTypes)
-input_data = SelectTimeseries().run(dataSet, {"timeseries": "Time,root.test.d2.s2"})
-result = algorithm.run(input_data, params)
-algorithm.write(outputPaths, result, outputTypes, outputLocation)
+            # run the SQL query
+            result = sqldf(command)
+            print(result.values)
+            del globals()[inputPath]
 
-df = algorithm.run(input_data, params).next()
-
-# for func in ['resample', 'sample']:
-    # globals()[func] = eval(func)
-
-
-# resample()
-
-def resample(**kwargs):
-    algorithm.run(kwargs)
-
-data_sql = sqldf("select Time, \"resample(root.test.d2.s2, 'every'='1.0s', 'interp'='BFill', 'aggr'='Min', 'start'='2022-01-01 00:00:05', 'end'='2022-01-01 00:00:20')\" from df where Time <= '2022-01-01 00:00:12';")
-
-# # data_sql = sqldf(input(">>> "))
-print(data_sql.head(10))
+        except Exception as e:
+            print(e)
+            print("error")
