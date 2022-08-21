@@ -5,20 +5,20 @@ import time
 class spread(FlokAlgorithmLocal):
     def run(self, inputDataSets, params):
         input_data = inputDataSets.get(0)
-        timeseries = params.get("timeseries", None)
-        if timeseries:
-            timeseries_list = timeseries.split(',')
-            time_ = params.get("time_", None)
-            output_data = input_data[timeseries_list]
-            count = int(time.mktime(time.strptime(
-                time_, "%Y-%m-%d %H:%M:%S"))-time.mktime(time.strptime(output_data['Time'][0], "%Y-%m-%d %H:%M:%S")))
-            a = output_data[timeseries_list[1]][0:count+1]
-            spread=max(a)-min(a)
-            j = 'spread({})'.format(timeseries_list[1])
-            output_data = pd.DataFrame(
-                {'Time': '1970-01-01 08:00:00.000', j: spread}, index=[0])
-        else:
-            output_data = input_data
+        column=input_data.columns[1]
+        #time_ = params.get("time_", None)
+        output_data = input_data
+        '''
+        count = int(time.mktime(time.strptime(
+            time_, "%Y-%m-%d %H:%M:%S"))-time.mktime(time.strptime(output_data['Time'][0], "%Y-%m-%d %H:%M:%S")))
+        a = output_data[column][0:count+1]
+        spread=max(a)-min(a)
+        '''
+        spread = max(output_data[column])-min(output_data[column])
+        j = 'spread({})'.format(column)
+        output_data = pd.DataFrame(
+            {'Time': '1970-01-01 08:00:00.000', j: spread}, index=[0])
+
         result = FlokDataFrame()
         result.addDF(output_data)
         return result
@@ -34,7 +34,7 @@ if __name__ == "__main__":
         "output": ["./test_out_1.csv"],
         "outputFormat": ["csv"],
         "outputLocation": ["local_fs"],
-        "parameters": {}
+        "parameters": {"time_": '2022-01-01 00:00:10'}
     }
 
     params = all_info_1["parameters"]
@@ -47,6 +47,9 @@ if __name__ == "__main__":
 
     dataSet = algorithm.read(inputPaths, inputTypes,
                              inputLocation, outputPaths, outputTypes)
+    from SelectTimeseries import SelectTimeseries
+    dataSet = SelectTimeseries().run(
+        dataSet, {"timeseries": "Time,root.test.d2.s2"})
     result = algorithm.run(dataSet, params)
     algorithm.write(outputPaths, result, outputTypes, outputLocation)
 
@@ -57,7 +60,7 @@ if __name__ == "__main__":
         "output": ["./test_out_2.csv"],
         "outputFormat": ["csv"],
         "outputLocation": ["local_fs"],
-        "parameters": {"timeseries": "Time,root.test.d2.s2", "time_": '2022-01-01 00:00:10'}
+        "parameters": {"time_": '2022-01-01 00:00:10'}
     }
 
     params = all_info_2["parameters"]
@@ -70,5 +73,8 @@ if __name__ == "__main__":
 
     dataSet = algorithm.read(inputPaths, inputTypes,
                              inputLocation, outputPaths, outputTypes)
+    from SelectTimeseries import SelectTimeseries
+    dataSet = SelectTimeseries().run(
+        dataSet, {"timeseries": "Time,root.test.d2.s2"})
     result = algorithm.run(dataSet, params)
     algorithm.write(outputPaths, result, outputTypes, outputLocation)

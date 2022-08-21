@@ -61,9 +61,9 @@ class segment(FlokAlgorithmLocal):
             timeseries_list = timeseries.split(',')
             output_data = input_data[timeseries_list]
             column = timeseries_list[1]
-            str_='segment({a},error={b})'.format(a=column,b=error)
             output = params.get("output", 'first')
             error = params.get("error", 0.1)
+            str_ = 'segment({a},\"error\"={b})'.format(a=column, b=error)
             if all([((output_data[column][i] - output_data[column][i-1])-(output_data[column][1] - output_data[column][0]))<1e-10 for i in range(1,len(output_data))]):
                 if output == 'all':
                     output_data=output_data

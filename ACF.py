@@ -20,20 +20,19 @@ class acf(FlokAlgorithmLocal):
     def run(self, inputDataSets, params):
         input_data = inputDataSets.get(0)
         timeseries = params.get("timeseries", None)
-        count=0
         if timeseries:
             timeseries_list = timeseries.split(',')
             output_data = input_data[timeseries_list]
-            time_ = params.get("time_", None)
+            #time_ = params.get("time_", None)
             time0=output_data['Time'][0]
             time0_ = time.mktime(time.strptime(time0, '%Y-%m-%d %H:%M:%S'))
-            count = int(time.mktime(time.strptime(time_, '%Y-%m-%d %H:%M:%S'))-time0_)
+            #count = int(time.mktime(time.strptime(time_, '%Y-%m-%d %H:%M:%S'))-time0_)
             output_data.fillna(0, inplace=True)
-            a = output_data[timeseries_list[1]][0:count]
-            end_value=output_data[timeseries_list[1]].values[count-1]
+            a = output_data[timeseries_list[1]]
+            end_value=output_data[timeseries_list[1]].values[-1]
             c=acf.run_acf(list(a),end_value)
             Time = []
-            for i in range(0, 2*count-1):
+            for i in range(0, 2*len(a)-1):
                 q = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time0_+i))
                 Time.append(q)
             j = 'acf({f})'.format(f=timeseries_list[1])
@@ -41,7 +40,6 @@ class acf(FlokAlgorithmLocal):
             output_data = pd.DataFrame(data)
         else:
             output_data = input_data
-        print(output_data)
         result = FlokDataFrame()
         result.addDF(output_data)
         return result
@@ -57,7 +55,7 @@ if __name__ == "__main__":
         "output": ["./test_out_1.csv"],
         "outputFormat": ["csv"],
         "outputLocation": ["local_fs"],
-        "parameters": {}
+        "parameters": {"timeseries": "Time,root.test.d2.s2"}
     }
 
     params = all_info_1["parameters"]
@@ -72,7 +70,7 @@ if __name__ == "__main__":
                              inputLocation, outputPaths, outputTypes)
     result = algorithm.run(dataSet, params)
     algorithm.write(outputPaths, result, outputTypes, outputLocation)
-
+    '''
     all_info_2 = {
         "input": ["./test_in.csv"],
         "inputFormat": ["csv"],
@@ -80,7 +78,7 @@ if __name__ == "__main__":
         "output": ["./test_out_2.csv"],
         "outputFormat": ["csv"],
         "outputLocation": ["local_fs"],
-        "parameters": {"timeseries": "Time,root.test.d1.s1", 'time_': '2022-01-01 00:00:05'}
+        "parameters": {"timeseries": "Time,root.test.d2.s2"}
     }
 
     params = all_info_2["parameters"]
@@ -95,3 +93,4 @@ if __name__ == "__main__":
                              inputLocation, outputPaths, outputTypes)
     result = algorithm.run(dataSet, params)
     algorithm.write(outputPaths, result, outputTypes, outputLocation)
+    '''
