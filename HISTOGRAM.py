@@ -26,7 +26,8 @@ class histogram(FlokAlgorithmLocal):
                                 and output_data[column][j] < min+i*(max_-min)/count):
                             bucket[i-1] += 1
             Time = output_data['Time'][0:count]
-            j = 'histogram({f})'.format(f=timeseries_list[1])
+            j = 'histogram({},\"min={}\",\"max={}\",\"count={}\")'.format(
+                timeseries_list[1], max_, min, count)
             data = {'Time': Time, j: bucket}
             output_data = pd.DataFrame(data)
         else:
