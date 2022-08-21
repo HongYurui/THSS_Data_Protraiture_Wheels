@@ -24,16 +24,16 @@ class acf(FlokAlgorithmLocal):
         if timeseries:
             timeseries_list = timeseries.split(',')
             output_data = input_data[timeseries_list]
-            time_ = params.get("time_", None)
+            #time_ = params.get("time_", None)
             time0=output_data['Time'][0]
             time0_ = time.mktime(time.strptime(time0, '%Y-%m-%d %H:%M:%S'))
-            count = int(time.mktime(time.strptime(time_, '%Y-%m-%d %H:%M:%S'))-time0_)
+            #count = int(time.mktime(time.strptime(time_, '%Y-%m-%d %H:%M:%S'))-time0_)
             output_data.fillna(0, inplace=True)
-            a = output_data[timeseries_list[1]][0:count]
+            a = output_data[timeseries_list[1]]
             end_value=output_data[timeseries_list[1]].values[count-1]
             c=acf.run_acf(list(a),end_value)
             Time = []
-            for i in range(0, 2*count-1):
+            for i in range(0, 2*len(a)-1):
                 q = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time0_+i))
                 Time.append(q)
             j = 'acf({f})'.format(f=timeseries_list[1])
