@@ -31,16 +31,16 @@ algorithm.write(outputPaths, result, outputTypes, outputLocation)
 
 df = algorithm.run(input_data, params).next()
 
-for func in ['resample', 'sample']:
-    globals()[func] = eval(func)
+# for func in ['resample', 'sample']:
+    # globals()[func] = eval(func)
 
 
-resample()
+# resample()
 
-# def resample(**kwargs):
-#     algorithm.run(kwargs)
+def resample(**kwargs):
+    algorithm.run(kwargs)
 
-# data_sql = sqldf("select Time, \"resample(root.test.d2.s2, 'every'='1.0s', 'interp'='BFill', 'aggr'='Min', 'start'='2022-01-01 00:00:05', 'end'='2022-01-01 00:00:20')\" from df;")
+data_sql = sqldf("select Time, \"resample(root.test.d2.s2, 'every'='1.0s', 'interp'='BFill', 'aggr'='Min', 'start'='2022-01-01 00:00:05', 'end'='2022-01-01 00:00:20')\" from df where Time <= '2022-01-01 00:00:12';")
 
 # # data_sql = sqldf(input(">>> "))
-# print(data_sql.head())
+print(data_sql.head(10))
