@@ -9,7 +9,7 @@ class Percentile(FlokAlgorithmLocal):
         input_data = inputDataSets.get(0)
         rank = params.get("rank", 0.5)
         # header format
-        value_header = 'median(' + input_data.columns[1]
+        value_header = 'percentile(' + input_data.columns[1]
         param_list = ['rank', 'error']
         for param in param_list:
             if param in params:
