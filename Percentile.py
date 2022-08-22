@@ -15,17 +15,17 @@ class Percentile(FlokAlgorithmLocal):
             if param in params:
                 value_header += ', \'' + param + '\'=\'' + str(params[param]) + '\''
         value_header += ')'
-        output_data = pd.DataFrame([[0] * input_data.shape[1]], index=range(1), columns=input_data.columns)
+        output_data = pd.DataFrame([[0, 0]], index=range(1), columns=['Time', value_header])
        
-        for column in range(1, input_data.shape[1]):
-            data = np.array(input_data.iloc[:,column])
-            data.sort()
-            i = math.ceil(len(data)*rank)
-            if i > 1 :
-                quantile = float(data[i-1])
-            else :
-                quantile = float(data[0])
-            output_data.iloc[0, column] = quantile
+        
+        data = np.array(input_data.iloc[:,1])
+        data.sort()
+        i = math.ceil(len(data)*rank)
+        if i > 1 :
+            quantile = float(data[i-1])
+        else :
+            quantile = float(data[0])
+        output_data.iloc[0, 1] = quantile
         output_data.iloc[0, 0] = datetime.strptime(input_data.iloc[0, 0], "%Y-%m-%d %H:%M:%S").strftime("%Y-%m-%d 00:00:00")
 
         result = FlokDataFrame()
