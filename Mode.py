@@ -6,7 +6,7 @@ class Mode(FlokAlgorithmLocal):
     def run(self, inputDataSets, params):
         input_data = inputDataSets.get(0)
         # header format
-        value_header = 'minmax(' + input_data.columns[1]
+        value_header = 'mode(' + input_data.columns[1]
         value_header += ')'
         output_data = pd.DataFrame([[0, 0]], index=range(1), columns=['Time', value_header])
         
