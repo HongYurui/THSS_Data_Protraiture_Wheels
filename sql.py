@@ -1,7 +1,7 @@
 import re
 from pandas import merge
 from pandasql import sqldf
-from FlokAlgorithmLocal import FlokDataFrame
+from FlokAlgorithmLocal import FlokAlgorithmLocal, FlokDataFrame
 from Acf import Acf
 from Distinct import Distinct
 from Histogram import Histogram
@@ -33,6 +33,7 @@ while True:
     # command = "select Time, \"sample(s3, 'method'='isometric', 'k'='5')\" from root_test_d1 where Time <= '2022-01-01 00:00:12';"
     # command = "select Time, \"median(s1)\" from root_test_d1 where Time <= '2022-01-01 00:00:12';"
     # command = "select * from root_test_d1 where Time <= '2022-01-01 00:00:12';"
+    # command = "select Time from root_test_d1 where Time <= '2022-01-01 00:00:12';"
     if command in ["exit", "quit", "q"]:
         break
     elif command in ["help", "h"]:
@@ -45,15 +46,22 @@ while True:
         try:
             # preprocess the command by extracting patterns
             print(command)
-            pattern = re.findall(r"select\s+\w+,\s*[\"\'](\w+)\((\w+)(?:,\s+(.*))?\)[\"\']\s+from\s+(.*?)[\s;]+.*", command)[0]
-            print(1)
+            pattern = re.findall(r"select\s+(?:\w+,\s*[\"\'](\w+)\((\w+)(?:,\s*(.*))?\)[\"\']|\w+|\*)\s+from\s+(.*?)[\s;]+.*", command)[0]
+
+            # input the data
+            inputPath = pattern[-1]
+            inputPaths = [inputPath]
+            if pattern[0] == '':
+                globals()[inputPath] = FlokAlgorithmLocal().read(inputPaths, inputTypes, inputLocation, outputPaths, outputTypes).get(0)
+                print(sqldf(command))
+                continue
+
             print(pattern)
             funcName = pattern[0].capitalize()
             params = dict(re.findall(r"\'(\w+)\'\s*=\s*\'([\w\s\-\.:]+)\'", pattern[2]))
             if funcName == 'Sample' and params.get('method') == 'reservoir':
                 raise Exception("Sample method 'reservoir' is not supported in SQL query due to the randomness.")
-            inputPath = pattern[-1]
-            inputPaths = [inputPath]
+
 
             if input_params_pairs.get(inputPath) != params:
                 input_params_pairs[inputPath] = params
@@ -73,8 +81,7 @@ while True:
                         globals()[inputPath] = merge(globals()[inputPath], dataframe, on='Time')
 
             # run the SQL query
-            result = sqldf(command)
-            print(result)
+            print(sqldf(command))
 
         except Exception as e:
             print(e)
