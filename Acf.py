@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 import time
 from datetime import datetime
+
 class Acf(FlokAlgorithmLocal):
     def run_acf(x,end_value):
         len_x = len(x)
@@ -42,7 +43,7 @@ class Acf(FlokAlgorithmLocal):
         result = FlokDataFrame()
         result.addDF(output_data)
         return result
-      
+
 
 if __name__ == "__main__":
     algorithm = Acf()
