@@ -34,7 +34,7 @@ class Pacf(FlokAlgorithmLocal):
             output_data.insert(loc=len(output_data.columns), column=input_data.iloc[0, column], value=data)
         for index in range(0, lag+1):
             output_data.iloc[index,0] = input_data.iloc[index,0]
-
+        print(output_data)
         result = FlokDataFrame()
         result.addDF(output_data)
         return result
