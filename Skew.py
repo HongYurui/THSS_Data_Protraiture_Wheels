@@ -13,10 +13,9 @@ class Skew(FlokAlgorithmLocal):
         std = math.sqrt(sum((output_data[column]-mean) **
                         2)/len(output_data[column]))
         skew = sum(((output_data[column]-mean)/std)** 3)/len(output_data[column])
-        # j = 'skew({})'.format(column)
-        # data = {'Time': '1970-01-01 08:00:00.000', j: skew}
-        # output_data = pd.DataFrame(data, index=[0])
-        output_data = pd.DataFrame([['1970-01-01 08:00:00.000', skew]], index=[0], columns=['Time', 'skew(s1)'])
+        j = 'skew({})'.format(column)
+        data = {'Time': '1970-01-01 08:00:00.000', j: skew}
+        output_data = pd.DataFrame(data, index=[0])
 
         result = FlokDataFrame()
         result.addDF(output_data)
