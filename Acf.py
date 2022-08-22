@@ -23,7 +23,7 @@ class Acf(FlokAlgorithmLocal):
         column=input_data.columns[1]
         #time_ = params.get("time_", None)
         time0_ = time.mktime(time.strptime(
-            '1970-01-01 08:00:00', '%Y-%m-%d %H:%M:%S'))
+            '1970-01-01 00:00:00', '%Y-%m-%d %H:%M:%S'))
         #count = int(time.mktime(time.strptime(time_, '%Y-%m-%d %H:%M:%S'))-time0_)
         output_data.fillna(0, inplace=True)
         a = output_data[column]
