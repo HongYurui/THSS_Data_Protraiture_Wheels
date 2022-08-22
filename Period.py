@@ -5,38 +5,38 @@ from FlokAlgorithmLocal import FlokAlgorithmLocal, FlokDataFrame
 class Period(FlokAlgorithmLocal):
     def run(self, inputDataSets, params):
         input_data = inputDataSets.get(0)
-        output_data = pd.DataFrame([[0] * input_data.shape[1]], index=range(1), columns=input_data.columns)
-        time_data = pd.Series([datetime.strptime(data, "%Y-%m-%d %H:%M:%S") for data in input_data.iloc[:, 0].values])
-        
+        # header format
+        value_header = 'period(' + input_data.columns[1]
+        value_header += ')'
+        output_data = pd.DataFrame([[0, 0]], index=range(1), columns=['Time', value_header])
+      
         period = input_data.shape[0]
-        flag = 1
-        for column in range(1, input_data.shape[1]):
-            for i in range(1, input_data.shape[0]-1):
-                if input_data.iloc[i, column] == input_data.iloc[0, column]:
-                    if input_data.shape[0] % i != 0:
-                        flag = 0
-                        break
+        data = input_data.iloc[:,1]
+        flag = 0
+        for i in range(1,int(len(data)/2)):
+            if data[i] != data[0]:
+                pass
+            elif data[i] == data[0]:
+                if len(data) % i != 0:
+                    pass
+                else:
                     flag = 1
                     j = 0
                     k = j
-                    while k+2*i < input_data.shape[0]:
-                        for j in range(k, k+i):
-                            if input_data.iloc[j, column] != input_data.iloc[j+i, column]:
+                    while k+2*i-1 < len(data):
+                        for j in range(k, k+i-1):
+                            if data[j] != data[j+i]:
                                 flag = 0
                                 break
-                        k = k+i
                         if flag == 0:
                             break
-                else:
-                    flag = 0
-                    break
+                        k = k+i
             if flag == 1:
                 period = i
                 break
-            print(period)
-            output_data[0, column] = period
-                
-        output_data.iloc[0, 0] = time_data[0].strftime("%Y-%m-%d 00:00:00")
+        output_data.iloc[0, 1] = period
+        output_data.iloc[0, 0] = datetime.strptime(input_data.iloc[0, 0], "%Y-%m-%d %H:%M:%S").strftime("%Y-%m-%d 00:00:00")
+        
         result = FlokDataFrame()
         result.addDF(output_data)
         return result
