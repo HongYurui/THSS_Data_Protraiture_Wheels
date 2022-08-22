@@ -13,6 +13,8 @@ inputLocation = ['local_fs']
 outputPaths = ['./test_out.csv']
 outputTypes = ['csv']
 
+input_params_pairs: dict = {}
+
 while True:
     command = input(">>> ")
     ## constant commands for debugging
@@ -31,7 +33,6 @@ while True:
         try:
             # preprocess the command by extracting patterns
             pattern = re.findall(r"select\s+\w+,\s+\"(\w+)\((\w+),\s+(.*)\)\"\s+from\s+(.*?)[\s;]+.*", command)[0]
-            print(pattern)
             funcName = pattern[0].capitalize()
             params = dict(re.findall(r"\'(\w+)\'\s*=\s*\'([\w\s\-\.:]+)\'", pattern[2]))
             if funcName == 'Sample' and params.get('method') == 'reservoir':
@@ -39,22 +40,26 @@ while True:
             inputPath = pattern[3]
             inputPaths = [inputPath]
 
-            # run the algorithm
-            algorithm = globals()[funcName]()
-            data = algorithm.read(inputPaths, inputTypes, inputLocation, outputPaths, outputTypes).get(0)
-            for series in data.columns[1:]:
-                flokdataframe = FlokDataFrame()
-                flokdataframe.addDF(data.loc[:, ['Time', series]])
-                dataframe = algorithm.run(flokdataframe, params).get(0)
-                if inputPath not in globals().keys():
-                    globals()[inputPath] = dataframe
-                else:
-                    globals()[inputPath] = merge(globals()[inputPath], dataframe, on='Time')
+            if input_params_pairs.get(inputPath) != params:
+                input_params_pairs[inputPath] = params
+                if inputPath in globals().keys():
+                    del globals()[inputPath]
+
+                # run the algorithm
+                algorithm = globals()[funcName]()
+                data = algorithm.read(inputPaths, inputTypes, inputLocation, outputPaths, outputTypes).get(0)
+                for series in data.columns[1:]:
+                    flokdataframe = FlokDataFrame()
+                    flokdataframe.addDF(data.loc[:, ['Time', series]])
+                    dataframe = algorithm.run(flokdataframe, params).get(0)
+                    if inputPath not in globals().keys():
+                        globals()[inputPath] = dataframe
+                    else:
+                        globals()[inputPath] = merge(globals()[inputPath], dataframe, on='Time')
 
             # run the SQL query
             result = sqldf(command)
-            print(result.values)
-            del globals()[inputPath]
+            print(result)
 
         except Exception as e:
             print(e)
