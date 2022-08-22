@@ -17,7 +17,7 @@ from Resample import Resample
 from Sample import Sample
 from Segment import Segment
 from SelectTimeseries import SelectTimeseries
-from 
+from Skew import Skew
 
 inputTypes = ['csv']
 inputLocation = ['local_fs']
@@ -26,15 +26,15 @@ outputTypes = ['csv']
 
 input_params_pairs: dict = {}
 
-if True:
-    # command = input(">>> ")
+while True:
+    command = input(">>> ")
     ## constant commands for debugging
     # command = "select Time, \"resample(s2, 'every'='1.0s', 'interp'='BFill', 'aggr'='Min', 'start'='2022-01-01 00:00:02', 'end'='2022-01-01 00:00:08')\" from root_test_d1 where Time <= '2022-01-01 00:00:12';"
     # command = "select Time, \"sample(s3, 'method'='isometric', 'k'='5')\" from root_test_d1 where Time <= '2022-01-01 00:00:12';"
-    command = "select Time, \"median(s1)\" from root_test_d1 where Time <= '2022-01-01 00:00:12';"
+    # command = "select Time, \"median(s1)\" from root_test_d1 where Time <= '2022-01-01 00:00:12';"
+    # command = "select * from root_test_d1 where Time <= '2022-01-01 00:00:12';"
     if command in ["exit", "quit", "q"]:
-        # break
-        pass
+        break
     elif command in ["help", "h"]:
         print("""
         exit, quit, q: exit
@@ -44,13 +44,15 @@ if True:
     else:
         try:
             # preprocess the command by extracting patterns
-            pattern = re.findall(r"select\s+\w+(,\s+\"(\w+)\((\w+),\s+(.*))?\)\"\s+from\s+(.*?)[\s;]+.*", command)[0]
+            print(command)
+            pattern = re.findall(r"select\s+\w+,\s*[\"\'](\w+)\((\w+)(?:,\s+(.*))?\)[\"\']\s+from\s+(.*?)[\s;]+.*", command)[0]
+            print(1)
             print(pattern)
             funcName = pattern[0].capitalize()
             params = dict(re.findall(r"\'(\w+)\'\s*=\s*\'([\w\s\-\.:]+)\'", pattern[2]))
             if funcName == 'Sample' and params.get('method') == 'reservoir':
                 raise Exception("Sample method 'reservoir' is not supported in SQL query due to the randomness.")
-            inputPath = pattern[3]
+            inputPath = pattern[-1]
             inputPaths = [inputPath]
 
             if input_params_pairs.get(inputPath) != params:
