@@ -9,12 +9,12 @@ def yule_walker(ts, order):
     x = np.array(ts) - np.mean(ts)
     n = x.shape[0]
 
-    r = np.zeros(order+1, np.float64) 
-    r[0] = x.dot(x) / n 
+    r = np.zeros(order+1, np.float64)
+    r[0] = x.dot(x) / n
     for k in range(1, order+1):
-        r[k] = x[:-k].dot(x[k:]) / (n - k) 
+        r[k] = x[:-k].dot(x[k:]) / (n - k)
     R = toeplitz(r[:-1])
-    return np.linalg.solve(R, r[1:]) 
+    return np.linalg.solve(R, r[1:])
 
 def pacf(ts, k):
     res = [1,]
@@ -34,11 +34,11 @@ class Pacf(FlokAlgorithmLocal):
             output_data.insert(loc=len(output_data.columns), column=input_data.iloc[0, column], value=data)
         for index in range(0, lag+1):
             output_data.iloc[index,0] = input_data.iloc[index,0]
-        print(output_data)
+
         result = FlokDataFrame()
         result.addDF(output_data)
         return result
-        
+
 if __name__ == "__main__":
     algorithm = Pacf()
 
