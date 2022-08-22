@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 import time
 
-class acf(FlokAlgorithmLocal):
+class Acf(FlokAlgorithmLocal):
     def run_acf(x,end_value):
         len_x = len(x)
         q = ([0]*len_x)
@@ -19,34 +19,31 @@ class acf(FlokAlgorithmLocal):
         return list(p/end_value)
     def run(self, inputDataSets, params):
         input_data = inputDataSets.get(0)
-        timeseries = params.get("timeseries", None)
-        if timeseries:
-            timeseries_list = timeseries.split(',')
-            output_data = input_data[timeseries_list]
-            #time_ = params.get("time_", None)
-            time0=output_data['Time'][0]
-            time0_ = time.mktime(time.strptime(time0, '%Y-%m-%d %H:%M:%S'))
-            #count = int(time.mktime(time.strptime(time_, '%Y-%m-%d %H:%M:%S'))-time0_)
-            output_data.fillna(0, inplace=True)
-            a = output_data[timeseries_list[1]]
-            end_value=output_data[timeseries_list[1]].values[-1]
-            c=acf.run_acf(list(a),end_value)
-            Time = []
-            for i in range(0, 2*len(a)-1):
-                q = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time0_+i))
-                Time.append(q)
-            j = 'acf({f})'.format(f=timeseries_list[1])
-            data = {'Time': Time, j: c}
-            output_data = pd.DataFrame(data)
-        else:
-            output_data = input_data
+        output_data = input_data
+        column=input_data.columns[1]
+        #time_ = params.get("time_", None)
+        time0=output_data['Time'][0]
+        time0_ = time.mktime(time.strptime(time0, '%Y-%m-%d %H:%M:%S'))
+        #count = int(time.mktime(time.strptime(time_, '%Y-%m-%d %H:%M:%S'))-time0_)
+        output_data.fillna(0, inplace=True)
+        a = output_data[column]
+        end_value=output_data[column].values[-1]
+        c=Acf.run_acf(list(a),end_value)
+        Time = []
+        for i in range(0, 2*len(a)-1):
+            q = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time0_+i))
+            Time.append(q)
+        j = 'acf({f})'.format(f=column)
+        data = {'Time': Time, j: c}
+        output_data = pd.DataFrame(data)
+
         result = FlokDataFrame()
         result.addDF(output_data)
         return result
       
 
 if __name__ == "__main__":
-    algorithm = acf()
+    algorithm = Acf()
 
     all_info_1 = {
         "input": ["./test_in.csv"],
@@ -55,7 +52,7 @@ if __name__ == "__main__":
         "output": ["./test_out_1.csv"],
         "outputFormat": ["csv"],
         "outputLocation": ["local_fs"],
-        "parameters": {"timeseries": "Time,root.test.d2.s2"}
+        "parameters": {}
     }
 
     params = all_info_1["parameters"]
@@ -68,6 +65,9 @@ if __name__ == "__main__":
 
     dataSet = algorithm.read(inputPaths, inputTypes,
                              inputLocation, outputPaths, outputTypes)
+    from SelectTimeseries import SelectTimeseries
+    dataSet = SelectTimeseries().run(
+        dataSet, {"timeseries": "Time,root.test.d2.s2"})
     result = algorithm.run(dataSet, params)
     algorithm.write(outputPaths, result, outputTypes, outputLocation)
     '''
