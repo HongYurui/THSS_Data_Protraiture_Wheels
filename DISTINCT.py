@@ -1,21 +1,16 @@
 from FlokAlgorithmLocal import FlokAlgorithmLocal, FlokDataFrame
 import pandas as pd
 
-
-class distinct(FlokAlgorithmLocal):
+class Distinct(FlokAlgorithmLocal):
     def run(self, inputDataSets, params):
         input_data = inputDataSets.get(0)
-        timeseries = params.get("timeseries", None)
-        if timeseries:
-            timeseries_list = timeseries.split(',')
-            output_data = input_data[timeseries_list]
-            q = len(set(output_data[timeseries_list[1]]))
-            j = 'distinct({})'.format([timeseries_list[1]])
-            data = {'Time': (output_data['Time'][0:q]), j: list(
-            set(output_data[timeseries_list[1]]))}
-            output_data = pd.DataFrame(data)
-        else:
-            output_data = input_data
+        output_data=input_data
+        column=input_data.columns[1]
+        q = len(set(output_data[column]))
+        j = 'distinct({})'.format(column)
+        data = {'Time': (output_data['Time'][0:q]), j: list(
+            set(output_data[column]))}
+        output_data = pd.DataFrame(data)
         
         result = FlokDataFrame()
         result.addDF(output_data)
@@ -23,7 +18,7 @@ class distinct(FlokAlgorithmLocal):
 
 
 if __name__ == "__main__":
-    algorithm = distinct()
+    algorithm = Distinct()
     all_info_1 = {
         "input": ["./test_in.csv"],
         "inputFormat": ["csv"],
@@ -44,8 +39,12 @@ if __name__ == "__main__":
 
     dataSet = algorithm.read(inputPaths, inputTypes,
                              inputLocation, outputPaths, outputTypes)
+    from SelectTimeseries import SelectTimeseries
+    dataSet = SelectTimeseries().run(
+        dataSet, {"timeseries": "Time,root.test.d2.s2"})
     result = algorithm.run(dataSet, params)
     algorithm.write(outputPaths, result, outputTypes, outputLocation)
+    '''
     all_info_2 = {
         "input": ["./test_in.csv"],
         "inputFormat": ["csv"],
@@ -68,3 +67,4 @@ if __name__ == "__main__":
                              inputLocation, outputPaths, outputTypes)
     result = algorithm.run(dataSet, params)
     algorithm.write(outputPaths, result, outputTypes, outputLocation)
+    '''

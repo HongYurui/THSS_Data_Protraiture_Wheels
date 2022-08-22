@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from datetime import datetime
 
 
-class spline(FlokAlgorithmLocal):
+class Spline(FlokAlgorithmLocal):
     def run(self, inputDataSets, params):
         input_data = inputDataSets.get(0)
 
@@ -29,7 +29,7 @@ class spline(FlokAlgorithmLocal):
             y = (interpolate.splev(x, tck, der=0)).tolist()
             for i in range(0, len(x)):
                 x[i] = datetime.fromtimestamp(x[i]+time0)
-            j = 'spline({},\"points={}\")'.format(column,points)
+            j = 'spline({},\'points\'=\'{}\')'.format(column,points)
             data = {'Time': x, j: y}
             output_data = pd.DataFrame(data)
         else:
@@ -41,7 +41,7 @@ class spline(FlokAlgorithmLocal):
 
 
 if __name__ == "__main__":
-    algorithm = spline()
+    algorithm = Spline()
     all_info_1 = {
         "input": ["./test_in.csv"],
         "inputFormat": ["csv"],

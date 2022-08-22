@@ -1,26 +1,29 @@
 from FlokAlgorithmLocal import FlokAlgorithmLocal, FlokDataFrame
 import math
+import pandas as pd
 
-
-class zscore(FlokAlgorithmLocal):
+class Zscore(FlokAlgorithmLocal):
     def run(self, inputDataSets, params):
         input_data = inputDataSets.get(0)
         output_data = input_data
         column = input_data.columns[1]
-        compute = params.get("compute", 'batch')
+        compute = params.get('compute', 'batch')
         if compute == 'stream':
             avg = params.get("avg", 0)
             std = params.get("std", 1)
             output_data[column] = (output_data[column]-avg)/std
-            j = 'zscore({},\'avg\'={},\'std\'={})'.format(column, avg, std)
-            output_data.columns = ['Time', j]
+            j = 'Zscore({},\'avg\'=\'{}\',\'std\'=\'{}\')'.format(
+                column, avg, std)
+            data = {'Time': output_data['Time'], j: output_data[column]}
+            output_data = pd.DataFrame(data)
         else:
             mean = sum(output_data[column])/len(output_data[column])
             std = math.sqrt(
                 sum((output_data[column]-mean) ** 2)/len(output_data[column]))
             output_data[column] = (output_data[column]-mean)/std
-            j = 'zscore({})'.format(column)
-            output_data.columns = ['Time', j]
+            j = 'Zscore('+str(column)+')'
+            data = {'Time': output_data['Time'], j: output_data[column]}
+            output_data = pd.DataFrame(data)
 
         result = FlokDataFrame()
         result.addDF(output_data)
@@ -28,7 +31,7 @@ class zscore(FlokAlgorithmLocal):
 
 
 if __name__ == "__main__":
-    algorithm = zscore()
+    algorithm = Zscore()
 
     all_info_1 = {
         "input": ["./test_in.csv"],

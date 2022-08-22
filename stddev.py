@@ -3,7 +3,7 @@ import math
 import pandas as pd
 
 
-class stddev(FlokAlgorithmLocal):
+class Stddev(FlokAlgorithmLocal):
     def run(self, inputDataSets, params):
         input_data = inputDataSets.get(0)
         output_data = input_data
@@ -22,7 +22,7 @@ class stddev(FlokAlgorithmLocal):
 
 
 if __name__ == "__main__":
-    algorithm = stddev()
+    algorithm = Stddev()
 
     all_info_1 = {
         "input": ["./test_in.csv"],

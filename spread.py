@@ -2,7 +2,7 @@ from FlokAlgorithmLocal import FlokAlgorithmLocal, FlokDataFrame
 from datetime import datetime
 import pandas as pd
 import time
-class spread(FlokAlgorithmLocal):
+class Spread(FlokAlgorithmLocal):
     def run(self, inputDataSets, params):
         input_data = inputDataSets.get(0)
         column=input_data.columns[1]
@@ -25,7 +25,7 @@ class spread(FlokAlgorithmLocal):
 
 
 if __name__ == "__main__":
-    algorithm = spread()
+    algorithm = Spread()
 
     all_info_1 = {
         "input": ["./test_in.csv"],
