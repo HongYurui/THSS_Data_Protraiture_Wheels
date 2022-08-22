@@ -3,7 +3,7 @@ import math
 import pandas as pd
 
 
-class skew(FlokAlgorithmLocal):
+class Skew(FlokAlgorithmLocal):
     def run(self, inputDataSets, params):
         input_data = inputDataSets.get(0)
         output_data = input_data
@@ -23,7 +23,7 @@ class skew(FlokAlgorithmLocal):
 
 
 if __name__ == "__main__":
-    algorithm = skew()
+    algorithm = Skew()
 
     all_info_1 = {
         "input": ["./test_in.csv"],
