@@ -28,7 +28,7 @@ class Pacf(FlokAlgorithmLocal):
         params["lag"] = min(input_data.shape[0]-1, int(10*math.log10(input_data.shape[0])))
         lag = params.get("lag")
         # header format
-        value_header = 'minmax(' + input_data.columns[1]
+        value_header = 'pacf(' + input_data.columns[1]
         param_list = ['lag']
         for param in param_list:
             if param in params:
