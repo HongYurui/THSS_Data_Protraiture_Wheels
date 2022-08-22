@@ -1,0 +1,52 @@
+from datetime import datetime
+import pandas as pd
+import numpy as np
+import math
+from FlokAlgorithmLocal import FlokAlgorithmLocal, FlokDataFrame
+
+class Percentile(FlokAlgorithmLocal):
+    def run(self, inputDataSets, params):
+        input_data = inputDataSets.get(0)
+        output_data = pd.DataFrame([[0] * input_data.shape[1]], index=range(1), columns=input_data.columns)
+        time_data = pd.Series([datetime.strptime(data, "%Y-%m-%d %H:%M:%S") for data in input_data.iloc[:, 0].values])
+        
+        rank = params.get("rank", 0.5)
+        for column in range(1, input_data.shape[1]):
+            data = np.array(input_data.iloc[:,column])
+            data.sort()
+            i = math.ceil(len(data)*rank)
+            if i > 1 :
+                quantile = float(data[i-1])
+            else :
+                quantile = float(data[0])
+            output_data.iloc[0, column] = quantile
+
+        output_data.iloc[0, 0] = time_data[0].strftime("%Y-%m-%d 00:00:00")
+        result = FlokDataFrame()
+        result.addDF(output_data)
+        return result
+        
+if __name__ == "__main__":
+    algorithm = Percentile()
+
+    all_info_1 = {
+        "input": ["./test_in.csv"],
+        "inputFormat": ["csv"],
+        "inputLocation": ["local_fs"],
+        "output": ["./test_out_1.csv"],
+        "outputFormat": ["csv"],
+        "outputLocation": ["local_fs"],
+        "parameters": {'rank' : 0.5, 'error' : 0}
+    }
+
+    params = all_info_1["parameters"]
+    inputPaths = all_info_1["input"]
+    inputTypes = all_info_1["inputFormat"]
+    inputLocation = all_info_1["inputLocation"]
+    outputPaths = all_info_1["output"]
+    outputTypes = all_info_1["outputFormat"]
+    outputLocation = all_info_1["outputLocation"]
+
+    dataSet = algorithm.read(inputPaths, inputTypes, inputLocation, outputPaths, outputTypes)
+    result = algorithm.run(dataSet, params)
+    algorithm.write(outputPaths, result, outputTypes, outputLocation)
