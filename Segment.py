@@ -1,7 +1,7 @@
 from FlokAlgorithmLocal import FlokAlgorithmLocal, FlokDataFrame
 import numpy as np 
 import pandas as pd
-
+from datetime import datetime 
 class Segment(FlokAlgorithmLocal):
     def calculate_error(st, seq_range):
         x = np.arange(seq_range[0], seq_range[1] + 1)
@@ -67,21 +67,26 @@ class Segment(FlokAlgorithmLocal):
             if output == 'all':
                 output_data=output_data
             else:
-                output_data=pd.DataFrame({'Time':output_data['Time'][0],str_:output_data[column][0]},index=[0])
+                output_data=pd.DataFrame({'Time':'1970-01-01 08:00:00.000',str_:output_data[column][0]},index=[0])
         else:  
             seg_piece = Segment.Bottom_Up(list(output_data[column]), error)
             data = []
+            n=len(seg_piece)
+            Time = []
             if output=='all':
                 for i in range(len(seg_piece)):
                     data += seg_piece[i]
+                for i in range(n):
+                    Time.append(datetime.fromtimestamp((i+1)/1000.0))
                 output_data = pd.DataFrame(
-                    {'Time': (output_data['Time']), str_: data})
+                    {'Time': Time, str_: data})
             else:
                 for i in range(len(seg_piece)):
                     data.append(seg_piece[i][0])
-                output_data = pd.DataFrame(
-                    {'Time': output_data['Time'][0:len(data)], str_: data})
-
+                for i in range(len(data)):
+                    Time.append(datetime.fromtimestamp((i+1)/1000.0))
+                output_data = pd.DataFrame({'Time': Time, str_: data})
+        
         result = FlokDataFrame()
         result.addDF(output_data)
         return result

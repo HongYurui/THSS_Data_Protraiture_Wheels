@@ -2,7 +2,7 @@ from FlokAlgorithmLocal import FlokAlgorithmLocal, FlokDataFrame
 import numpy as np
 import pandas as pd
 import time
-
+from datetime import datetime
 class Acf(FlokAlgorithmLocal):
     def run_acf(x,end_value):
         len_x = len(x)
@@ -22,8 +22,8 @@ class Acf(FlokAlgorithmLocal):
         output_data = input_data
         column=input_data.columns[1]
         #time_ = params.get("time_", None)
-        time0=output_data['Time'][0]
-        time0_ = time.mktime(time.strptime(time0, '%Y-%m-%d %H:%M:%S'))
+        time0_ = time.mktime(time.strptime(
+            '1970-01-01 08:00:00', '%Y-%m-%d %H:%M:%S'))
         #count = int(time.mktime(time.strptime(time_, '%Y-%m-%d %H:%M:%S'))-time0_)
         output_data.fillna(0, inplace=True)
         a = output_data[column]
@@ -31,7 +31,8 @@ class Acf(FlokAlgorithmLocal):
         c=Acf.run_acf(list(a),end_value)
         Time = []
         for i in range(0, 2*len(a)-1):
-            q = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time0_+i))
+            #q = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time0_+i/1000.0))
+            q=datetime.fromtimestamp((i+1)/1000.0)
             Time.append(q)
         j = 'acf({f})'.format(f=column)
         data = {'Time': Time, j: c}

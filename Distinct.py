@@ -1,6 +1,6 @@
 from FlokAlgorithmLocal import FlokAlgorithmLocal, FlokDataFrame
 import pandas as pd
-
+from datetime import datetime
 class Distinct(FlokAlgorithmLocal):
     def run(self, inputDataSets, params):
         input_data = inputDataSets.get(0)
@@ -8,7 +8,10 @@ class Distinct(FlokAlgorithmLocal):
         column=input_data.columns[1]
         q = len(set(output_data[column]))
         j = 'distinct({})'.format(column)
-        data = {'Time': (output_data['Time'][0:q]), j: list(
+        Time=[]
+        for i in range(q):
+            Time.append(datetime.fromtimestamp((i+1)/1000.0))
+        data = {'Time': Time, j: list(
             set(output_data[column]))}
         output_data = pd.DataFrame(data)
         

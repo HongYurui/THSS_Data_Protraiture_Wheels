@@ -1,7 +1,7 @@
 from importlib import import_module
 from FlokAlgorithmLocal import FlokAlgorithmLocal, FlokDataFrame
 import pandas as pd
-
+from datetime import datetime
 class Histogram(FlokAlgorithmLocal):
     def run(self, inputDataSets, params):
         input_data = inputDataSets.get(0)
@@ -23,7 +23,8 @@ class Histogram(FlokAlgorithmLocal):
                     if (output_data[column][j] >= min+(i-1)*(max_-min)/count
                             and output_data[column][j] < min+i*(max_-min)/count):
                         bucket[i-1] += 1
-        Time = output_data['Time'][0:count]
+        for i in range(count):
+            Time.append(datetime.fromtimestamp((i+1)/1000.0))
         j = 'histogram({},\'min\'=\'{}\',\'max\'=\'{}\',\'count\'=\'{}\')'.format(
             column, max_, min, count)
         data = {'Time': Time, j: bucket}

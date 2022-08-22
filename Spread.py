@@ -6,14 +6,7 @@ class Spread(FlokAlgorithmLocal):
     def run(self, inputDataSets, params):
         input_data = inputDataSets.get(0)
         column=input_data.columns[1]
-        #time_ = params.get("time_", None)
         output_data = input_data
-        '''
-        count = int(time.mktime(time.strptime(
-            time_, "%Y-%m-%d %H:%M:%S"))-time.mktime(time.strptime(output_data['Time'][0], "%Y-%m-%d %H:%M:%S")))
-        a = output_data[column][0:count+1]
-        spread=max(a)-min(a)
-        '''
         spread = max(output_data[column])-min(output_data[column])
         j = 'spread({})'.format(column)
         output_data = pd.DataFrame(
