@@ -7,10 +7,16 @@ from FlokAlgorithmLocal import FlokAlgorithmLocal, FlokDataFrame
 class Percentile(FlokAlgorithmLocal):
     def run(self, inputDataSets, params):
         input_data = inputDataSets.get(0)
-        output_data = pd.DataFrame([[0] * input_data.shape[1]], index=range(1), columns=input_data.columns)
-        time_data = pd.Series([datetime.strptime(data, "%Y-%m-%d %H:%M:%S") for data in input_data.iloc[:, 0].values])
-        
         rank = params.get("rank", 0.5)
+        # header format
+        value_header = 'median(' + input_data.columns[1]
+        param_list = ['rank', 'error']
+        for param in param_list:
+            if param in params:
+                value_header += ', \'' + param + '\'=\'' + str(params[param]) + '\''
+        value_header += ')'
+        output_data = pd.DataFrame([[0] * input_data.shape[1]], index=range(1), columns=input_data.columns)
+       
         for column in range(1, input_data.shape[1]):
             data = np.array(input_data.iloc[:,column])
             data.sort()
@@ -20,8 +26,8 @@ class Percentile(FlokAlgorithmLocal):
             else :
                 quantile = float(data[0])
             output_data.iloc[0, column] = quantile
+        output_data.iloc[0, 0] = datetime.strptime(input_data.iloc[0, 0], "%Y-%m-%d %H:%M:%S").strftime("%Y-%m-%d 00:00:00")
 
-        output_data.iloc[0, 0] = time_data[0].strftime("%Y-%m-%d 00:00:00")
         result = FlokDataFrame()
         result.addDF(output_data)
         return result
