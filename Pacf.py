@@ -27,13 +27,18 @@ class Pacf(FlokAlgorithmLocal):
         input_data = inputDataSets.get(0)
         params["lag"] = min(input_data.shape[0]-1, int(10*math.log10(input_data.shape[0])))
         lag = params.get("lag")
-        output_data = pd.DataFrame(index=range(lag+1), columns=input_data.columns, dtype=object)
-
-        for column in range(1, input_data.shape[1]):
-            data = pacf(np.array(input_data.iloc[:, column]), lag)
-            output_data.insert(loc=len(output_data.columns), column=input_data.iloc[0, column], value=data)
-        for index in range(0, lag+1):
-            output_data.iloc[index,0] = input_data.iloc[index,0]
+        # header format
+        value_header = 'minmax(' + input_data.columns[1]
+        param_list = ['lag']
+        for param in param_list:
+            if param in params:
+                value_header += ', \'' + param + '\'=\'' + str(params[param]) + '\''
+        value_header += ')'
+        output_data = pd.DataFrame(index=range(lag+1), columns=['Time'], dtype=object)
+        
+        data = pacf(np.array(input_data.iloc[:, 1]), lag)
+        output_data.insert(loc=len(output_data.columns), column=value_header, value=data)
+        output_data.iloc[:,0] = input_data.iloc[:,0]
 
         result = FlokDataFrame()
         result.addDF(output_data)
