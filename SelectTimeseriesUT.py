@@ -32,6 +32,7 @@ class SelectTimeseriesUT(unittest.TestCase):
         outputPaths = all_info_1["output"]
         outputTypes = all_info_1["outputFormat"]
         outputLocation = all_info_1["outputLocation"]
+        #每次更改部分参数
         #acf
         algorithm = Acf()
         all_info_1['output'] = ["./test_out_1_acf.csv"]
