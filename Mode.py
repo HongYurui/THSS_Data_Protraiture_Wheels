@@ -1,20 +1,19 @@
 from datetime import datetime
 import pandas as pd
-from datetime import datetime
-import pandas as pd
 from FlokAlgorithmLocal import FlokAlgorithmLocal, FlokDataFrame
 
 class Mode(FlokAlgorithmLocal):
     def run(self, inputDataSets, params):
         input_data = inputDataSets.get(0)
-        output_data = pd.DataFrame([[0] * input_data.shape[1]], index=range(1), columns=input_data.columns)
-        time_data = pd.Series([datetime.strptime(data, "%Y-%m-%d %H:%M:%S") for data in input_data.iloc[:, 0].values])
+        # header format
+        value_header = 'minmax(' + input_data.columns[1]
+        value_header += ')'
+        output_data = pd.DataFrame([[0, 0]], index=range(1), columns=['Time', value_header])
         
         # calculation via pd.DataFrame.mode()
-        for column in range(1, input_data.shape[1]):
-            output_data.iloc[0, column] = input_data.iloc[:, column].astype(float).mode()[0]
+        output_data.iloc[0, 1] = input_data.iloc[:, 1].astype(float).mode()[0]
+        output_data.iloc[0, 0] = datetime.strptime(input_data.iloc[0, 0], "%Y-%m-%d %H:%M:%S").strftime("%Y-%m-%d 00:00:00")
         
-        output_data.iloc[0, 0] = time_data[0].strftime("%Y-%m-%d 00:00:00")
         result = FlokDataFrame()
         result.addDF(output_data)
         return result
