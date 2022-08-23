@@ -4,36 +4,33 @@ import pandas as pd
 import time
 from datetime import datetime
 
+
 class Acf(FlokAlgorithmLocal):
-    def run_acf(x,end_value):
+    def run_acf(x, end_value):
         len_x = len(x)
         q = ([0]*len_x)
         p = []
         for i in range(len_x):
             q = (x[i:len_x+1])
             if len(q) < len_x:
-                q+=[0]*(len_x-len(q))
+                q += [0]*(len_x-len(q))
             p.append(np.dot(q, x))
         p.reverse()
         for i in range(0, len_x-1):
             p.append(p[len_x-2-i])
         return list(p/end_value)
+
     def run(self, inputDataSets, params):
         input_data = inputDataSets.get(0)
         output_data = input_data
-        column=input_data.columns[1]
-        #time_ = params.get("time_", None)
-        time0_ = time.mktime(time.strptime(
-            '1970-01-01 00:00:00', '%Y-%m-%d %H:%M:%S'))
-        #count = int(time.mktime(time.strptime(time_, '%Y-%m-%d %H:%M:%S'))-time0_)
+        column = input_data.columns[1]
         output_data.fillna(0, inplace=True)
         a = output_data[column]
-        end_value=output_data[column].values[-1]
-        c=Acf.run_acf(list(a),end_value)
+        end_value = output_data[column].values[-1]
+        c = Acf.run_acf(list(a), end_value)
         Time = []
         for i in range(0, 2*len(a)-1):
-            #q = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time0_+i/1000.0))
-            q=datetime.fromtimestamp((i+1)/1000.0)
+            q = datetime.fromtimestamp((i+1)/1000.0)
             Time.append(q)
         Time = pd.Series([t.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3] for t in Time])
         j = 'acf({f})'.format(f=column)

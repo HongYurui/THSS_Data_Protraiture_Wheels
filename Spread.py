@@ -27,7 +27,7 @@ if __name__ == "__main__":
         "output": ["./test_out_1.csv"],
         "outputFormat": ["csv"],
         "outputLocation": ["local_fs"],
-        "parameters": {"time_": '2022-01-01 00:00:10'}
+        "parameters": {}
     }
 
     params = all_info_1["parameters"]
@@ -45,7 +45,7 @@ if __name__ == "__main__":
         dataSet, {"timeseries": "Time,root.test.d2.s2"})
     result = algorithm.run(dataSet, params)
     algorithm.write(outputPaths, result, outputTypes, outputLocation)
-
+'''
     all_info_2 = {
         "input": ["./test_in.csv"],
         "inputFormat": ["csv"],
@@ -68,6 +68,7 @@ if __name__ == "__main__":
                              inputLocation, outputPaths, outputTypes)
     from SelectTimeseries import SelectTimeseries
     dataSet = SelectTimeseries().run(
-        dataSet, {"timeseries": "Time,root.test.d2.s2"})
+        dataSet, {})
     result = algorithm.run(dataSet, params)
     algorithm.write(outputPaths, result, outputTypes, outputLocation)
+'''

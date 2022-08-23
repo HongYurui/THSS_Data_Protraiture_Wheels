@@ -10,9 +10,10 @@ from datetime import datetime
 class Spline(FlokAlgorithmLocal):
     def run(self, inputDataSets, params):
         input_data = inputDataSets.get(0)
-
         output_data = input_data
         points = params.get("points", None)
+        if isinstance(points, str):
+            points = int(points)
         if len(output_data) >= 4:
             column = input_data.columns[1]
             #output_data[column] = output_data[column]**3
@@ -28,8 +29,10 @@ class Spline(FlokAlgorithmLocal):
             x = (np.linspace(min(Time), max(Time), points)).tolist()
             y = (interpolate.splev(x, tck, der=0)).tolist()
             for i in range(0, len(x)):
-                x[i] = datetime.fromtimestamp(x[i]+time0)
-            j = 'spline({},\'points\'=\'{}\')'.format(column,points)
+                x[i] = datetime.fromtimestamp(x[i])
+                #print(type(x[i]))
+            Time = pd.Series([t.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3] for t in x])
+            j = 'spline({},\'points\'=\'{}\')'.format(column, points)
             data = {'Time': x, j: y}
             output_data = pd.DataFrame(data)
         else:
@@ -67,6 +70,7 @@ if __name__ == "__main__":
         dataSet, {"timeseries": "Time,root.test.d2.s2"})
     result = algorithm.run(dataSet, params)
     algorithm.write(outputPaths, result, outputTypes, outputLocation)
+    '''
     all_info_2 = {
         "input": ["./test_in.csv"],
         "inputFormat": ["csv"],
@@ -92,3 +96,4 @@ if __name__ == "__main__":
         dataSet, {"timeseries": "Time,root.test.d2.s2"})
     result = algorithm.run(dataSet, params)
     algorithm.write(outputPaths, result, outputTypes, outputLocation)
+    '''
