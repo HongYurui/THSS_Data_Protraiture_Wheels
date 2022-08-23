@@ -2,15 +2,23 @@ from importlib import import_module
 from FlokAlgorithmLocal import FlokAlgorithmLocal, FlokDataFrame
 import pandas as pd
 from datetime import datetime
+
+
 class Histogram(FlokAlgorithmLocal):
     def run(self, inputDataSets, params):
         input_data = inputDataSets.get(0)
         output_data = input_data
-        column=input_data.columns[1]
+        column = input_data.columns[1]
         max_value = max(output_data[column])
         min = params.get("min", -max_value)
         max_ = params.get("max_", max_value)
         count = params.get("count", 1)
+        if isinstance(min, str):
+            min = float(min)
+        if isinstance(max_, str):
+            max_ = float(max_)
+        if isinstance(count, str):
+            count = int(count)
         bucket = [0]*count
         Time = []
         for j in range(len(output_data[column])):
@@ -25,10 +33,11 @@ class Histogram(FlokAlgorithmLocal):
                         bucket[i-1] += 1
         for i in range(count):
             Time.append(datetime.fromtimestamp((i+1)/1000.0))
+        Time = pd.Series([t.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3] for t in Time])
         j = 'histogram({},\'min\'=\'{}\',\'max\'=\'{}\',\'count\'=\'{}\')'.format(
-            column, max_, min, count)
+            column, min, max_, count)
         data = {'Time': Time, j: bucket}
-        output_data = pd.DataFrame(data)    
+        output_data = pd.DataFrame(data)
         result = FlokDataFrame()
         result.addDF(output_data)
         return result
