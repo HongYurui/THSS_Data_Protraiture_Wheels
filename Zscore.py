@@ -46,7 +46,7 @@ if __name__ == "__main__":
     algorithm = Zscore()
 
     all_info_1 = {
-        "input": ["./test_in.csv"],
+        "input": ["./root_test_d1"],
         "inputFormat": ["csv"],
         "inputLocation": ["local_fs"],
         "output": ["./test_out_1.csv"],
@@ -67,7 +67,7 @@ if __name__ == "__main__":
                              inputLocation, outputPaths, outputTypes)
     from SelectTimeseries import SelectTimeseries
     dataSet = SelectTimeseries().run(
-        dataSet, {"timeseries": "Time,root.test.d2.s2"})
+        dataSet, {"timeseries": "Time,s22"})
     result = algorithm.run(dataSet, params)
     algorithm.write(outputPaths, result, outputTypes, outputLocation)
 '''
