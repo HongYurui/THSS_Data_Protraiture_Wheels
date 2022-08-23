@@ -17,15 +17,18 @@ class ZscoreUT(unittest.TestCase):
         self.algorithm = Zscore()
 
     def test_zscore_1(self):
-        self.timeseries = {"timeseries": "Time,s1"}
+        self.timeseries = {"timeseries": "Time,s22"}
+        self.serieslength = 20
         self.params = {}
 
     def test_zscore_2(self):
-        self.timeseries = {"timeseries": "Time,s2"}
+        self.timeseries = {"timeseries": "Time,s22"}
+        self.serieslength = 20
         self.params = {"compute": "stream", "avg": 1, "std": 1}
 
     def tearDown(self):
-        dataset = SelectTimeseries().run(self.orig_dataset, self.timeseries)
+        dataset = FlokDataFrame()
+        dataset.addDF(SelectTimeseries().run(self.orig_dataset, self.timeseries).get(0).iloc[:self.serieslength])
         result = self.algorithm.run(dataset, self.params)
         print(result.get(0))
 
