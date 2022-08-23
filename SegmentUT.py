@@ -22,7 +22,7 @@ class SegmentUT(unittest.TestCase):
 
     def test_segment_2(self):
         self.timeseries = {"timeseries": "Time,root.test.d2.s2"}
-        self.params = {'output': 'all', 'error': 1}
+        self.params = {'output': 'all', }
 
     def tearDown(self):
         dataset = SelectTimeseries().run(self.orig_dataset, self.timeseries)
