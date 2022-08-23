@@ -1,4 +1,3 @@
-from math import nan
 import unittest
 from FlokAlgorithmLocal import FlokDataFrame, FlokAlgorithmLocal
 from SelectTimeseries import SelectTimeseries
@@ -16,17 +15,41 @@ class PacfUT(unittest.TestCase):
 
     def test_pacf_1(self):
         self.timeseries = {"timeseries": "Time,s1"}
-        self.params = {}
+        self.params = {"lag": 2}
+        dataset = SelectTimeseries().run(self.orif_dataset, self.timeseries)
+        result = self.algorithm.run(dataset, self.params)
+        print(result.get(0))
 
     def test_pacf_2(self):
-        self.timeseries = {"timeseries": "Time,s1"}
-        self.params = {"window": 4}
+        self.timeseries = {"timeseries": "Time,s2"}
+        self.params = {}
+        dataset = SelectTimeseries().run(self.orif_dataset, self.timeseries)
+        result = self.algorithm.run(dataset, self.params)
+        print(result.get(0))
 
     def test_pacf_3(self):
         self.timeseries = {"timeseries": "Time,s2"}
-        self.params = {"window": 8}
+        self.params = {"lag": 8}
+        dataset = SelectTimeseries().run(self.orif_dataset, self.timeseries)
+        result = self.algorithm.run(dataset, self.params)
+        print(result.get(0))
     
     def test_pacf_4(self):
+        self.timeseries = {"timeseries": "Time,s2"}
+        self.params = {"lag": -1}
+        dataset = SelectTimeseries().run(self.orif_dataset, self.timeseries)
+        result = self.algorithm.run(dataset, self.params)
+        print(result.get(0))
+    
+    def test_pacf_5(self):
+        self.timeseries = {"timeseries": "Time,s6"}
+        self.params = {}
+        dataset = FlokDataFrame()
+        dataset.addDF(SelectTimeseries().run(self.orif_dataset, self.timeseries).get(0).iloc[:4])
+        result = self.algorithm.run(dataset, self.params)
+        print(result.get(0))
+
+    def test_pacf_6(self):
         input_paths = ["root_test_d1"]
         input_types = ["csv"]
         input_location = ["local_fs"]
@@ -36,11 +59,12 @@ class PacfUT(unittest.TestCase):
         self.algorithm = Pacf()
         self.timeseries = {"timeseries": "Time,s10"}
         self.params = {"lag" : 5}
-
-    def tearDown(self):
-        dataset = SelectTimeseries().run(self.orif_dataset, self.timeseries)
+        dataset = FlokDataFrame()
+        dataset.addDF(SelectTimeseries().run(self.orif_dataset, self.timeseries).get(0).iloc[:20])
         result = self.algorithm.run(dataset, self.params)
         print(result.get(0))
+
+    def tearDown(self):
         pass
 
 
