@@ -82,12 +82,11 @@ class Segment(FlokAlgorithmLocal):
         else:
             seg_piece = Segment.Bottom_Up(list(output_data[column]), error)
             data = []
-            n = len(seg_piece)
             Time = []
             if output == 'all':
                 for i in range(len(seg_piece)):
                     data += seg_piece[i]
-                for i in range(n):
+                for i in range(len(output_data)):
                     Time.append(datetime.fromtimestamp((i+1)/1000.0))
                 Time = pd.Series(
                     [t.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3] for t in Time])
