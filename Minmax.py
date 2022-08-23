@@ -1,4 +1,3 @@
-from datetime import datetime
 import pandas as pd
 from FlokAlgorithmLocal import FlokAlgorithmLocal, FlokDataFrame
 
@@ -12,7 +11,7 @@ class Minmax(FlokAlgorithmLocal):
         # header format
         value_header = 'minmax(' + input_data.columns[1]
         param_list = ['compute', 'min', 'max']
-        if compute == "compute":
+        if compute == "stream":
             for param in param_list:
                 if param in params:
                     value_header += ', \'' + param + '\'=\'' + str(params[param]) + '\''
