@@ -24,20 +24,18 @@ class Acf(FlokAlgorithmLocal):
         input_data = inputDataSets.get(0)
         output_data = input_data
         column = input_data.columns[1]
-        #time_ = params.get("time_", None)
-        #time0_ = time.mktime(time.strptime('1970-01-01 08:00:00', '%Y-%m-%d %H:%M:%S'))
-        #count = int(time.mktime(time.strptime(time_, '%Y-%m-%d %H:%M:%S'))-time0_)
         output_data.fillna(0, inplace=True)
-        a = output_data[column]
+        value = output_data[column]
         end_value = output_data[column].values[-1]
-        c = Acf.run_acf(list(a), end_value)
+        acf_value = Acf.run_acf(list(value), end_value)
         Time = []
-        for i in range(0, 2*len(a)-1):
+        for i in range(0, 2*len(value)-1):
             q = datetime.fromtimestamp((i+1)/1000.0)
             Time.append(q)
-        Time = pd.Series([t.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3] for t in Time])
+        Time = pd.Series([t.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
+                         for t in Time])
         j = 'acf({f})'.format(f=column)
-        data = {'Time': Time, j: c}
+        data = {'Time': Time, j: acf_value}
         output_data = pd.DataFrame(data)
 
         result = FlokDataFrame()
@@ -49,7 +47,7 @@ if __name__ == "__main__":
     algorithm = Acf()
 
     all_info_1 = {
-        "input": ["root_test_d1"],
+        "input": ["./test_in.csv"],
         "inputFormat": ["csv"],
         "inputLocation": ["local_fs"],
         "output": ["./test_out_1.csv"],
@@ -70,7 +68,7 @@ if __name__ == "__main__":
                              inputLocation, outputPaths, outputTypes)
     from SelectTimeseries import SelectTimeseries
     dataSet = SelectTimeseries().run(
-        dataSet, {"timeseries": "Time,s2"})
+        dataSet, {"timeseries": "Time,root.test.d2.s2"})
     result = algorithm.run(dataSet, params)
     algorithm.write(outputPaths, result, outputTypes, outputLocation)
     '''
