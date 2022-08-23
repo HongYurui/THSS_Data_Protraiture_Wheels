@@ -1,10 +1,11 @@
 import unittest
+import pandas as pd
 from FlokAlgorithmLocal import FlokDataFrame, FlokAlgorithmLocal
 from SelectTimeseries import SelectTimeseries
 from Integral import Integral
 
 
-class integralUT(unittest.TestCase):
+class IntegralUT(unittest.TestCase):
 
     def setUp(self):
         input_paths = ["root_test_d1"]
@@ -29,7 +30,6 @@ class integralUT(unittest.TestCase):
         dataset = FlokDataFrame()
         data = SelectTimeseries().run(self.orig_dataset, self.timeseries).get(0).iloc[:self.serieslength]
         # timestamp not identical but vital, reset required
-        import pandas as pd
         for i in [5 ,6, 7]:
             data.iloc[i, 0]  = pd.to_datetime(data.iloc[i, 0]) + pd.Timedelta(seconds=2)
         dataset.addDF(data)

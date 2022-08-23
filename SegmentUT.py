@@ -7,7 +7,7 @@ from Segment import Segment
 class SegmentUT(unittest.TestCase):
 
     def setUp(self):
-        input_paths = ["test_in.csv"]
+        input_paths = ["root_test_d1"]
         input_types = ["csv"]
         input_location = ["local_fs"]
         output_paths = ["root_test_d1_out.csv"]
@@ -17,12 +17,14 @@ class SegmentUT(unittest.TestCase):
         self.algorithm = Segment()
 
     def test_segment_1(self):
-        self.timeseries = {"timeseries": "Time,root.test.d2.s2"}
-        self.params = {'output': 'first', 'error': 0.1}
+        self.timeseries = {"timeseries": "Time,s16"}
+        self.serieslength = 40
+        self.params = {'error': "0.1"}
 
     def test_segment_2(self):
-        self.timeseries = {"timeseries": "Time,root.test.d2.s2"}
-        self.params = {'output': 'all', 'error': 1}
+        self.timeseries = {"timeseries": "Time,s16"}
+        self.serieslength = 40
+        self.params = {'output': 'all', 'error': "1"}
 
     def tearDown(self):
         dataset = SelectTimeseries().run(self.orig_dataset, self.timeseries)

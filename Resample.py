@@ -21,8 +21,8 @@ class Resample(FlokAlgorithmLocal):
         except:
             raise Exception("Invalid parameter 'every'")
 
-        interp = params.get("interp", "NaN")
-        aggr = params.get("aggr", "Mean")
+        interp = params.get("interp", "nan")
+        aggr = params.get("aggr", "mean")
         start = pd.to_datetime(params.get('start'), format="%Y-%m-%d %H:%M:%S") if params.get('start') is not None else left
         end = pd.to_datetime(params.get('end'), format="%Y-%m-%d %H:%M:%S") if params.get('end') is not None else right
         orig_period = (time_data.iloc[-1] - time_data[0]).seconds / (len(time_data) - 1)
@@ -55,22 +55,22 @@ class Resample(FlokAlgorithmLocal):
         # resample function definitions
         # upsample
         if period <= orig_period:
-            if interp == "NaN":
+            if interp == "nan":
                 def resample_func(timestamp, orig_idx):
                     if time_data[orig_idx] < timestamp - time_tol:
                         orig_idx += 1
                     return orig_idx, value_data[orig_idx] if time_data[orig_idx] < timestamp + time_tol else pd.NA
-            elif interp == "FFill":
+            elif interp == "ffill":
                 def resample_func(timestamp, orig_idx):
                     if time_data[orig_idx] < timestamp + time_tol:
                         orig_idx += 1
                     return orig_idx, value_data[orig_idx - 1]
-            elif interp == "BFill":
+            elif interp == "bfill":
                 def resample_func(timestamp, orig_idx):
                     if time_data[orig_idx] < timestamp - time_tol:
                         orig_idx += 1
                     return orig_idx, value_data[orig_idx]
-            elif interp == "Linear":
+            elif interp == "linear":
                 def resample_func(timestamp, orig_idx):
                     if time_data[orig_idx + 1] < timestamp - time_tol:
                         orig_idx += 1
@@ -79,7 +79,7 @@ class Resample(FlokAlgorithmLocal):
                 raise Exception("Invalid parameter 'interp'")
         # downsample
         else:
-            if aggr == "Max":
+            if aggr == "max":
                 def resample_func(timestamp, orig_idx):
                     max = value_data[orig_idx]
                     while time_data[orig_idx + 1] < timestamp + time_tol:
@@ -87,7 +87,7 @@ class Resample(FlokAlgorithmLocal):
                         if value_data[orig_idx] > max:
                             max = value_data[orig_idx]
                     return orig_idx + 1, max
-            elif aggr == "Min":
+            elif aggr == "min":
                 def resample_func(timestamp, orig_idx):
                     min = value_data[orig_idx]
                     while time_data[orig_idx + 1] < timestamp + time_tol:
@@ -95,18 +95,18 @@ class Resample(FlokAlgorithmLocal):
                         if value_data[orig_idx] < min:
                             min = value_data[orig_idx]
                     return orig_idx + 1, min
-            elif aggr == "First":
+            elif aggr == "first":
                 def resample_func(timestamp, orig_idx):
                     res = value_data[orig_idx]
                     while time_data[orig_idx + 1] < timestamp + time_tol:
                         orig_idx += 1
                     return orig_idx + 1, res
-            elif aggr == "Last":
+            elif aggr == "last":
                 def resample_func(timestamp, orig_idx):
                     while time_data[orig_idx + 1] < timestamp + time_tol:
                         orig_idx += 1
                     return orig_idx + 1, value_data[orig_idx]
-            elif aggr == "Mean":
+            elif aggr == "mean":
                 def resample_func(timestamp, orig_idx):
                     sum = value_data[orig_idx]
                     count = 1
@@ -115,7 +115,7 @@ class Resample(FlokAlgorithmLocal):
                         orig_idx += 1
                         count += 1
                     return orig_idx + 1, sum / count
-            elif aggr == "Median":
+            elif aggr == "median":
                 def resample_func(timestamp, orig_idx):
                     data = [value_data[orig_idx]]
                     while time_data[orig_idx + 1] < timestamp + time_tol:

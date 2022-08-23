@@ -31,6 +31,7 @@ class Sample(FlokAlgorithmLocal):
                     random_int = random.randint(0, i)
                     if random_int < k:
                         output_data.iloc[random_int] = input_data.iloc[i]
+            output_data.sort_values(by=[value_header], inplace=True)
         # isometric sampling
         elif method == "isometric":
             step = int(len(input_data) / k)
