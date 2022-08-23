@@ -1,10 +1,10 @@
 import unittest
 from FlokAlgorithmLocal import FlokDataFrame, FlokAlgorithmLocal
 from SelectTimeseries import SelectTimeseries
-from Qlb import Qlb
+from Acf import Acf
 
 
-class QlbUT(unittest.TestCase):
+class AcfUT(unittest.TestCase):
 
     def setUp(self):
         input_paths = ["root_test_d1"]
@@ -13,17 +13,12 @@ class QlbUT(unittest.TestCase):
         output_paths = ["root_test_d1_out.csv"]
         output_types = ["csv"]
         self.orig_dataset = FlokAlgorithmLocal().read(input_paths, input_types, input_location, output_paths, output_types)
-        self.algorithm = Qlb()
+        self.algorithm = Acf()
 
     def test_qlb_1(self):
-        self.timeseries = {"timeseries": "Time,s13"}
-        self.serieslength = 20
+        self.timeseries = {"timeseries": "Time,s1"}
+        self.serieslength = 5
         self.params = {}
-
-    def test_qlb_2(self):
-        self.timeseries = {"timeseries": "Time,s13"}
-        self.serieslength = 20
-        self.params = {"lag": "5"}
 
     def tearDown(self):
         dataset = FlokDataFrame()
