@@ -1,9 +1,8 @@
 from FlokAlgorithmLocal import FlokAlgorithmLocal, FlokDataFrame
 import time
 import numpy as np
-from scipy import interpolate
+from scipy.interpolate import CubicSpline
 import pandas as pd
-import matplotlib.pyplot as plt
 from datetime import datetime
 
 
@@ -25,9 +24,11 @@ class Spline(FlokAlgorithmLocal):
                     output_data['Time'][i], "%Y-%m-%d %H:%M:%S"))-time0)
             value = output_data[column]
             # （t，c，k）包含节点向量、B样条曲线系数和样条曲线阶数的元组。
-            tck = interpolate.splrep(Time, value, k=3)
+            #tck = interpolate.splrep(Time, value, k=3)
+            c = CubicSpline(Time, value, bc_type=((1, 4.9), (1, 9.9)))
             x = (np.linspace(min(Time), max(Time), points)).tolist()
-            y = (interpolate.splev(x, tck, der=0)).tolist()
+            y=list(c(x))
+            #y = (interpolate.splev(x, tck, der=0)).tolist()
             for i in range(0, len(x)):
                 x[i] = datetime.fromtimestamp(x[i])
                 #print(type(x[i]))
