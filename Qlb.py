@@ -21,10 +21,12 @@ class Qlb(FlokAlgorithmLocal):
                 value_header += ', \'' + param + '\'=\'' + str(params[param]) + '\''
         value_header += ')'
 
-        # to be implemented
+        # time format
         output_data = pd.DataFrame(index=range(lag), columns=['Time', value_header])
         timestamp = pd.to_datetime("1970-01-01 08:00:00", format="%Y-%m-%d %H:%M:%S")
         timedelta = pd.to_timedelta(0.001, unit="s")
+        
+        # calculate square acf
         # acf_data = Acf().run(inputDataSets, {}).get(0).iloc[:, 1].values
         # acf_data /= max(acf_data)
         # print(acf_data)
