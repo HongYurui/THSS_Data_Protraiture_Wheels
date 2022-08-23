@@ -11,14 +11,16 @@ class Mode(FlokAlgorithmLocal):
         value_header = 'mode(' + input_data.columns[1]
         value_header += ')'
         output_data = pd.DataFrame([[0, 0]], index=range(1), columns=['Time', value_header])
-        input_type = type(input_data.iloc[1, 1])
         
-        # calculation via pd.DataFrame.mode()
-        nannum = input_data.iloc[:, 1].isna().sum()
-        if nannum > (input_data.iloc[:, 1] == input_data.iloc[:, 1].astype(input_type).mode()[0]).sum():
-                output_data.iloc[0, 1] = nan
+        nannum = 0
+        for j in range(0, input_data.shape[0]):
+            if input_data.iloc[j, 1] == nan:
+                nannum += 1
+        if nannum > (input_data.iloc[:, 1] == input_data.iloc[:, 1].mode()[0]).sum():
+                mode = nan
         else:
-            output_data.iloc[0, 1] = input_data.iloc[:, 1].mode()[0]
+            mode = input_data.iloc[:, 1].mode()[0]
+        output_data.iloc[0, 1] = mode
         output_data.iloc[0, 0] = datetime.strptime('1970-01-01 08:00:00', "%Y-%m-%d %H:%M:%S").strftime("%Y-%m-%d 08:00:00")
         
         result = FlokDataFrame()
