@@ -12,20 +12,23 @@ class SplineUT(unittest.TestCase):
         input_location = ["local_fs"]
         output_paths = ["root_test_d1_out.csv"]
         output_types = ["csv"]
-        self.orif_dataset = FlokAlgorithmLocal().read(
+        self.orig_dataset = FlokAlgorithmLocal().read(
             input_paths, input_types, input_location, output_paths, output_types)
         self.algorithm = Spline()
 
     def test_spline_1(self):
-        self.timeseries = {"timeseries": "Time,s2"}
+        self.timeseries = {"timeseries": "Time,s18"}
+        self.serieslength = 10
         self.params = {'points': 200}
 
     def test_spline_2(self):
-        self.timeseries = {"timeseries": "Time,s2"}
+        self.timeseries = {"timeseries": "Time,s18"}
+        self.serieslength = 10
         self.params = {'points': 150}
 
     def tearDown(self):
-        dataset = SelectTimeseries().run(self.orif_dataset, self.timeseries)
+        dataset = FlokDataFrame()
+        dataset.addDF(SelectTimeseries().run(self.orig_dataset, self.timeseries).get(0).iloc[:self.serieslength])
         result = self.algorithm.run(dataset, self.params)
         print(result.get(0))
 
