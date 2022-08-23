@@ -1,4 +1,5 @@
 import re
+import os
 from pandas import merge
 from pandasql import sqldf
 from FlokAlgorithmLocal import FlokAlgorithmLocal, FlokDataFrame
@@ -27,53 +28,62 @@ outputTypes = ['csv']
 input_params_pairs: dict = {}
 
 while True:
+    # terminal control
     command = input(">>> ")
-    ## constant commands for debugging
-    # command = "select Time, \"resample(s2, 'every'='1.0s', 'interp'='BFill', 'aggr'='Min', 'start'='2022-01-01 00:00:02', 'end'='2022-01-01 00:00:08')\" from root_test_d1 where Time <= '2022-01-01 00:00:12';"
-    # command = "select Time, \"sample(s3, 'method'='isometric', 'k'='5')\" from root_test_d1 where Time <= '2022-01-01 00:00:12';"
-    # command = "select Time, \"median(s1)\" from root_test_d1 where Time <= '2022-01-01 00:00:12';"
-    # command = "select * from root_test_d1 where Time <= '2022-01-01 00:00:12';"
-    # command = "select Time from root_test_d1 where Time <= '2022-01-01 00:00:12';"
     if command in ["exit", "quit", "q"]:
         break
     elif command in ["help", "h"]:
         print("""
         exit, quit, q: exit
         help, h: print this help
+        clear, clc, cls: clear screen
+        ls [path]: list files in path
+        cat [path]: print file content
         select timeseries from dataframe [where condition]: perform a SQL query
         """)
+    elif command in ["clear", "clc", "cls"]:
+        os.system("clear")
+    elif command == "ls" or command[:3] == "ls " or command[:4] == "cat ":
+        os.system(command)
+    elif command == "cd" or command[:3] == "cd ":
+        print("changing directory is not supported")
+    elif command  == "":
+        continue
     else:
         try:
             # preprocess the command by extracting patterns
-            print(command)
             pattern = re.findall(r"select\s+(?:\w+,\s*[\"\'](\w+)\((\w+)(?:,\s*(.*))?\)[\"\']|\w+|\*)\s*from\s+(.*?)[\s;]+.*", command)[0]
-
+            
             # input the data
             inputPath = pattern[-1]
             inputPaths = [inputPath]
+            originalInput = "orig_" + inputPath
+            if originalInput not in globals().keys():
+                globals()[originalInput] = FlokAlgorithmLocal().read(inputPaths, inputTypes, inputLocation, outputPaths, outputTypes).get(0)
+                
+            # handle queries for original data
             if pattern[0] == '':
-                globals()[inputPath] = FlokAlgorithmLocal().read(inputPaths, inputTypes, inputLocation, outputPaths, outputTypes).get(0)
+                globals()[inputPath] = globals()[originalInput].copy()
                 print(sqldf(command))
                 continue
 
-            print(pattern)
+            # handle queries for function results
             funcName = pattern[0].capitalize()
             params = dict(re.findall(r"\'(\w+)\'\s*=\s*\'([\w\s\-\.:]+)\'", pattern[2]))
             if funcName == 'Sample' and params.get('method') == 'reservoir':
                 raise Exception("Sample method 'reservoir' is not supported in SQL query due to the randomness.")
-
-
-            if input_params_pairs.get(inputPath) != params:
-                input_params_pairs[inputPath] = params
+            
+            # renew function name and parameters
+            if input_params_pairs.get(inputPath) != [funcName, params]:
+                input_params_pairs[inputPath] = [funcName, params]
                 if inputPath in globals().keys():
                     del globals()[inputPath]
 
                 # run the algorithm
                 algorithm = globals()[funcName]()
-                data = algorithm.read(inputPaths, inputTypes, inputLocation, outputPaths, outputTypes).get(0)
-                for series in data.columns[1:]:
+                for series in globals()[originalInput].columns[1:]:
                     flokdataframe = FlokDataFrame()
-                    flokdataframe.addDF(data.loc[:, ['Time', series]])
+                    flokdataframe.addDF(globals()[originalInput].loc[:, ['Time', series]])
                     dataframe = algorithm.run(flokdataframe, params).get(0)
                     if inputPath not in globals().keys():
                         globals()[inputPath] = dataframe

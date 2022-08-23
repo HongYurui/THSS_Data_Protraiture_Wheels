@@ -24,6 +24,9 @@ class Acf(FlokAlgorithmLocal):
         input_data = inputDataSets.get(0)
         output_data = input_data
         column = input_data.columns[1]
+        #time_ = params.get("time_", None)
+        #time0_ = time.mktime(time.strptime('1970-01-01 08:00:00', '%Y-%m-%d %H:%M:%S'))
+        #count = int(time.mktime(time.strptime(time_, '%Y-%m-%d %H:%M:%S'))-time0_)
         output_data.fillna(0, inplace=True)
         a = output_data[column]
         end_value = output_data[column].values[-1]
