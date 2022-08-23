@@ -12,6 +12,8 @@ class Qlb(FlokAlgorithmLocal):
 
         # get lag
         lag = params.get("lag", n - 2)
+        if isinstance(lag, str):
+            lag = int(lag)
 
         # header format
         value_header = 'qlb(' + input_data.columns[1]
@@ -25,13 +27,12 @@ class Qlb(FlokAlgorithmLocal):
         output_data = pd.DataFrame(index=range(lag), columns=['Time', value_header])
         timestamp = pd.to_datetime("1970-01-01 08:00:00", format="%Y-%m-%d %H:%M:%S")
         timedelta = pd.to_timedelta(0.001, unit="s")
-        
+
         # calculate square acf
         # acf_data = Acf().run(inputDataSets, {}).get(0).iloc[:, 1].values
         # acf_data /= max(acf_data)
         # print(acf_data)
-        acf_data = acf(inputDataSets.get(0).iloc[:, 1].values)[1:]
-        print(acf_data)
+        acf_data = acf(value_data)[1:]
         square_acf = [x ** 2 / (n - i - 1) for i, x in enumerate(acf_data)]
 
         for i in range(lag):
