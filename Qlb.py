@@ -1,6 +1,6 @@
 import pandas as pd
 from FlokAlgorithmLocal import FlokAlgorithmLocal, FlokDataFrame
-from Acf import Acf
+from statsmodels.tsa.stattools import acf
 from scipy.stats import chi2
 
 class Qlb(FlokAlgorithmLocal):
@@ -23,12 +23,11 @@ class Qlb(FlokAlgorithmLocal):
 
         # to be implemented
         output_data = pd.DataFrame(index=range(lag), columns=['Time', value_header])
-        timestamp = pd.to_datetime("1970-01-01 00:00:00", format="%Y-%m-%d %H:%M:%S")
+        timestamp = pd.to_datetime("1970-01-01 08:00:00", format="%Y-%m-%d %H:%M:%S")
         timedelta = pd.to_timedelta(0.001, unit="s")
         # acf_data = Acf().run(inputDataSets, {}).get(0).iloc[:, 1].values
         # acf_data /= max(acf_data)
         # print(acf_data)
-        from statsmodels.tsa.stattools import acf
         acf_data = acf(inputDataSets.get(0).iloc[:, 1].values)[1:]
         print(acf_data)
         square_acf = [x ** 2 / (n - i - 1) for i, x in enumerate(acf_data)]

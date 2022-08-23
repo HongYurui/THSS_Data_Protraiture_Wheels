@@ -43,7 +43,7 @@ class Integral(FlokAlgorithmLocal):
         else:
             raise Exception("Invalid unit: " + unit)
 
-        output_data.iloc[0, 0] = time_data[0].strftime("%Y-%m-%d 00:00:00.000")
+        output_data.iloc[0, 0] = "1970-01-01 08:00:00.000"
         output_data.iloc[0, 1] /= ratio
 
         result = FlokDataFrame()
