@@ -17,15 +17,18 @@ class StddevUT(unittest.TestCase):
         self.algorithm = Stddev()
 
     def test_stddev_1(self):
-        self.timeseries = {"timeseries": "Time,s1"}
+        self.timeseries = {"timeseries": "Time,s20"}
+        self.serieslength = 20
         self.params = {}
 
     def test_stddev_2(self):
-        self.timeseries = {"timeseries": "Time,s2"}
+        self.timeseries = {"timeseries": "Time,s20"}
+        self.serieslength = 10
         self.params = {}
 
     def tearDown(self):
-        dataset = SelectTimeseries().run(self.orig_dataset, self.timeseries)
+        dataset = FlokDataFrame()
+        dataset.addDF(SelectTimeseries().run(self.orig_dataset, self.timeseries).get(0).iloc[:self.serieslength])
         result = self.algorithm.run(dataset, self.params)
         print(result.get(0))
 

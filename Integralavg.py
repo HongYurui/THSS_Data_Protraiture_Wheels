@@ -12,7 +12,7 @@ class Integralavg(FlokAlgorithmLocal):
             start += 1
         while pd.isnull(end):
             end -= 1
-        timespan = (end - start).total_seconds()
+        timespan = (end - start).total_seconds() + 1
         output_data = pd.DataFrame([[integral_frame.iloc[0, 0], integral_frame.iloc[0, 1] / timespan]], index=range(1), columns=['Time', "integralavg" + integral_frame.columns[1][8:]])
 
         result = FlokDataFrame()
