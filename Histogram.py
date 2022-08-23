@@ -11,7 +11,7 @@ class Histogram(FlokAlgorithmLocal):
         column = input_data.columns[1]
         max_value = max(output_data[column])
         min = params.get("min", -max_value)
-        max_ = params.get("max_", max_value)
+        max_ = params.get("max", max_value)
         count = params.get("count", 1)
         if isinstance(min, str):
             min = float(min)
@@ -33,7 +33,8 @@ class Histogram(FlokAlgorithmLocal):
                         bucket[i-1] += 1
         for i in range(count):
             Time.append(datetime.fromtimestamp((i+1)/1000.0))
-        Time = pd.Series([t.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3] for t in Time])
+        Time = pd.Series([t.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
+                         for t in Time])
         j = 'histogram({},\'min\'=\'{}\',\'max\'=\'{}\',\'count\'=\'{}\')'.format(
             column, min, max_, count)
         data = {'Time': Time, j: bucket}
@@ -53,7 +54,7 @@ if __name__ == "__main__":
         "output": ["./test_out_1.csv"],
         "outputFormat": ["csv"],
         "outputLocation": ["local_fs"],
-        "parameters": {"min": 1, "max_": 20, "count": 10}
+        "parameters": {"min": 1, "max": 20.1, "count": 10}
     }
 
     params = all_info_1["parameters"]
