@@ -10,7 +10,10 @@ from Integral import Integral
 from Integralavg import Integralavg
 from Mad import Mad
 from Median import Median
+from Minmax import Minmax
 from Mode import Mode
+from Mvavg import Mvavg
+from Pacf import Pacf
 from Percentile import Percentile
 from Period import Period
 from Qlb import Qlb
@@ -19,6 +22,11 @@ from Sample import Sample
 from Segment import Segment
 from SelectTimeseries import SelectTimeseries
 from Skew import Skew
+from Spline import Spline
+from Spread import Spread
+from Stddev import Stddev
+from Zscore import Zscore
+
 
 inputTypes = ['csv']
 inputLocation = ['local_fs']
@@ -53,7 +61,6 @@ while True:
         try:
             # preprocess the command by extracting patterns
             pattern = re.findall(r"select\s+(?:\w+,\s*[\"\'](\w+)\((\w+)(?:,\s*(.*))?\)[\"\']|\w+|\*)\s*from\s+(.*?)[\s;]+.*", command)[0]
-            
             # input the data
             inputPath = pattern[-1]
             inputPaths = [inputPath]
@@ -81,15 +88,24 @@ while True:
 
                 # run the algorithm
                 algorithm = globals()[funcName]()
-                for series in globals()[originalInput].columns[1:]:
+                if funcName=='Segment':
                     flokdataframe = FlokDataFrame()
-                    flokdataframe.addDF(globals()[originalInput].loc[:, ['Time', series]])
+                    flokdataframe.addDF(
+                        globals()[originalInput].loc[:, ['Time', pattern[1]]])
                     dataframe = algorithm.run(flokdataframe, params).get(0)
                     if inputPath not in globals().keys():
                         globals()[inputPath] = dataframe
                     else:
                         globals()[inputPath] = merge(globals()[inputPath], dataframe, on='Time')
-
+                else:
+                    for series in globals()[originalInput].columns[1:]:
+                        flokdataframe = FlokDataFrame()
+                        flokdataframe.addDF(globals()[originalInput].loc[:, ['Time', series]])
+                        dataframe = algorithm.run(flokdataframe, params).get(0)
+                        if inputPath not in globals().keys():
+                            globals()[inputPath] = dataframe
+                        else:                       
+                            globals()[inputPath] = merge(globals()[inputPath], dataframe, on='Time')
             # run the SQL query
             print(sqldf(command))
 
