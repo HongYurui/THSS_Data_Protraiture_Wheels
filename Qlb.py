@@ -68,12 +68,13 @@ if __name__ == "__main__":
 
     dataSet = algorithm.read(inputPaths, inputTypes, inputLocation, outputPaths, outputTypes)
     from SelectTimeseries import SelectTimeseries
-    dataSet = SelectTimeseries().run(dataSet, {"timeseries": "Time,s2"})
+    dataSet = SelectTimeseries().run(dataSet, {"timeseries": "Time,s13"})
     tmp = FlokDataFrame()
     tmp.addDF(dataSet.get(0).iloc[:20, :])
     dataSet = tmp
     result = algorithm.run(dataSet, params)
-    algorithm.write(outputPaths, result, outputTypes, outputLocation)
+    # algorithm.write(outputPaths, result, outputTypes, outputLocation)
+    print(result.get(0))
 
     # all_info_2 = {
     #     "input": ["./test_in.csv"],
