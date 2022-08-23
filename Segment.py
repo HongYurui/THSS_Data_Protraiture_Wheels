@@ -70,15 +70,27 @@ class Segment(FlokAlgorithmLocal):
         error = params.get("error", 0.1)
         if isinstance(error, str):
             error = float(error)
-        str_ = 'segment({a},\'output\'=\'{b}\',\'error\'=\'{c}\')'.format(
-            a=column,b=output, c=error)
+        value_header = 'segment(' + column
+        param_list = ['output', 'error']
+        for param in param_list:
+            if param in params:
+                value_header += ', \'' + param + \
+                    '\'=\'' + str(params[param]) + '\''
+        value_header += ')'
+        #value_header = 'segment({a},\'output\'=\'{b}\',\'error\'=\'{c}\')'.format(a=column,b=output, c=error)
         # 如果输入是等差数列直接输出
         if all([((output_data[column][i] - output_data[column][i-1])-(output_data[column][1] - output_data[column][0])) < 1e-10 for i in range(1, len(output_data))]):
             if output == 'all':
-                output_data = output_data
+                Time = []
+                for i in range(len(output_data)):
+                    Time.append(datetime.fromtimestamp((i+1)/1000.0))
+                Time = pd.Series(
+                    [t.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3] for t in Time])
+                output_data = pd.DataFrame(
+                    {'Time': Time, value_header: output_data[column]})
             else:
                 output_data = pd.DataFrame(
-                    {'Time': '1970-01-01 08:00:00.000', str_: output_data[column][0]}, index=[0])
+                    {'Time': '1970-01-01 08:00:00.000', value_header: output_data[column][0]}, index=[0])
         else:
             seg_piece = Segment.Bottom_Up(list(output_data[column]), error)
             data = []
@@ -91,7 +103,7 @@ class Segment(FlokAlgorithmLocal):
                 Time = pd.Series(
                     [t.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3] for t in Time])
                 output_data = pd.DataFrame(
-                    {'Time': Time, str_: data})
+                    {'Time': Time, value_header: data})
             else:
                 for i in range(len(seg_piece)):
                     data.append(seg_piece[i][0])
@@ -99,7 +111,7 @@ class Segment(FlokAlgorithmLocal):
                     Time.append(datetime.fromtimestamp((i+1)/1000.0))
                 Time = pd.Series(
                     [t.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3] for t in Time])
-                output_data = pd.DataFrame({'Time': Time, str_: data})
+                output_data = pd.DataFrame({'Time': Time, value_header: data})
 
         result = FlokDataFrame()
         result.addDF(output_data)
@@ -116,7 +128,7 @@ if __name__ == "__main__":
         "output": ["./test_out_1.csv"],
         "outputFormat": ["csv"],
         "outputLocation": ["local_fs"],
-        "parameters": {'output': 'first', 'error': 0.1}
+        "parameters": {'output': 'all', 'error': 0.1}
     }
 
     params = all_info_1["parameters"]

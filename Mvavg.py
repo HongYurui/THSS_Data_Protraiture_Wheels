@@ -1,10 +1,10 @@
-from datetime import datetime
 import pandas as pd
 from FlokAlgorithmLocal import FlokAlgorithmLocal, FlokDataFrame
 
 class Mvavg(FlokAlgorithmLocal):
     def run(self, inputDataSets, params):
         input_data = inputDataSets.get(0)
+        input_data = input_data.dropna()
         # header format
         value_header = 'mvavg(' + input_data.columns[1]
         param_list = ['window']

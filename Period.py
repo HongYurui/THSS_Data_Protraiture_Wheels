@@ -5,6 +5,7 @@ from FlokAlgorithmLocal import FlokAlgorithmLocal, FlokDataFrame
 class Period(FlokAlgorithmLocal):
     def run(self, inputDataSets, params):
         input_data = inputDataSets.get(0)
+        input_data = input_data.dropna()
         # header format
         value_header = 'period(' + input_data.columns[1]
         value_header += ')'
@@ -35,7 +36,7 @@ class Period(FlokAlgorithmLocal):
                 period = i
                 break
         output_data.iloc[0, 1] = period
-        output_data.iloc[0, 0] = datetime.strptime(input_data.iloc[0, 0], "%Y-%m-%d %H:%M:%S").strftime("%Y-%m-%d 00:00:00")
+        output_data.iloc[0, 0] = datetime.strptime('1970-01-01 08:00:00', "%Y-%m-%d %H:%M:%S").strftime("%Y-%m-%d 08:00:00")
         
         result = FlokDataFrame()
         result.addDF(output_data)

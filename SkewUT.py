@@ -17,11 +17,13 @@ class SkewUT(unittest.TestCase):
         self.algorithm = Skew()
 
     def test_skew_1(self):
-        self.timeseries = {"timeseries": "Time,s2"}
+        self.timeseries = {"timeseries": "Time,s17"}
+        self.serieslength = 20
         self.params = {}
 
     def test_skew_2(self):
-        self.timeseries = {"timeseries": "Time,s2"}
+        self.timeseries = {"timeseries": "Time,s17"}
+        self.serieslength = 20
         self.params = {}
 
     def tearDown(self):

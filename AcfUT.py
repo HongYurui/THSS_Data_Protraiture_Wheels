@@ -15,7 +15,7 @@ class AcfUT(unittest.TestCase):
         self.orig_dataset = FlokAlgorithmLocal().read(input_paths, input_types, input_location, output_paths, output_types)
         self.algorithm = Acf()
 
-    def test_qlb_1(self):
+    def test_acf_1(self):
         self.timeseries = {"timeseries": "Time,s1"}
         self.serieslength = 5
         self.params = {}

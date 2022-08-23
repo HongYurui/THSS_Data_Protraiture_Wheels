@@ -1,4 +1,3 @@
-from datetime import datetime
 import pandas as pd
 import numpy as np
 import math
@@ -25,7 +24,10 @@ def pacf(ts, k):
 class Pacf(FlokAlgorithmLocal):
     def run(self, inputDataSets, params):
         input_data = inputDataSets.get(0)
-        params["lag"] = min(input_data.shape[0]-1, int(10*math.log10(input_data.shape[0])))
+        input_data = input_data.dropna()
+        lag = params.get("lag")
+        if lag == None:
+            params["lag"] = min(input_data.shape[0]-1, int(10*math.log10(input_data.shape[0])))
         lag = params.get("lag")
         # header format
         value_header = 'pacf(' + input_data.columns[1]

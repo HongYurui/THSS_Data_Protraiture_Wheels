@@ -22,9 +22,14 @@ class SegmentUT(unittest.TestCase):
         self.params = {'error': "0.1"}
 
     def test_segment_2(self):
+<<<<<<< HEAD
         self.timeseries = {"timeseries": "Time,s16"}
         self.serieslength = 40
         self.params = {'output': 'all', 'error': "1"}
+=======
+        self.timeseries = {"timeseries": "Time,root.test.d2.s2"}
+        self.params = {'output': 'all', }
+>>>>>>> d3b0f3230fbc8af981e72e83742472d480372013
 
     def tearDown(self):
         dataset = SelectTimeseries().run(self.orig_dataset, self.timeseries)
