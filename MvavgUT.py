@@ -1,4 +1,3 @@
-from math import nan
 import unittest
 from FlokAlgorithmLocal import FlokDataFrame, FlokAlgorithmLocal
 from SelectTimeseries import SelectTimeseries
@@ -24,9 +23,13 @@ class MvavgUT(unittest.TestCase):
 
     def test_mvavg_3(self):
         self.timeseries = {"timeseries": "Time,s2"}
-        self.params = {"window": 8}
-    
+        self.params = {"window": 30}
+
     def test_mvavg_4(self):
+        self.timeseries = {"timeseries": "Time,s2"}
+        self.params = {"window": -1}
+    
+    def test_mvavg_5(self):
         input_paths = ["root_test_d1"]
         input_types = ["csv"]
         input_location = ["local_fs"]
@@ -41,7 +44,6 @@ class MvavgUT(unittest.TestCase):
         dataset = SelectTimeseries().run(self.orif_dataset, self.timeseries)
         result = self.algorithm.run(dataset, self.params)
         print(result.get(0))
-        pass
 
 
 if __name__ == "__main__":
