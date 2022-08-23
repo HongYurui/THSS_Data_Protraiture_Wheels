@@ -15,12 +15,12 @@ class HistogramUT(unittest.TestCase):
         self.orig_dataset = FlokAlgorithmLocal().read(input_paths, input_types, input_location, output_paths, output_types)
         self.algorithm = Histogram()
 
-    def test_qlb_1(self):
+    def test_histogram_1(self):
         self.timeseries = {"timeseries": "Time,s3"}
         self.serieslength = 20
         self.params = {"min": "1", "max": "20", "count": "10"}
 
-    def test_qlb_2(self):
+    def test_histogram_2(self):
         self.timeseries = {"timeseries": "Time,s3"}
         self.serieslength = 20
         self.params = {"min": "5", "count": "7"}

@@ -17,15 +17,18 @@ class SpreadUT(unittest.TestCase):
         self.algorithm = Spread()
 
     def test_spread_1(self):
-        self.timeseries = {"timeseries": "Time,s1"}
+        self.timeseries = {"timeseries": "Time,s19"}
+        self.serieslength = 14
         self.params = {}
 
     def test_spread_2(self):
-        self.timeseries = {"timeseries": "Time,s2"}
+        self.timeseries = {"timeseries": "Time,s19"}
+        self.serieslength = 4
         self.params = {}
 
     def tearDown(self):
-        dataset = SelectTimeseries().run(self.orig_dataset, self.timeseries)
+        dataset = FlokDataFrame()
+        dataset.addDF(SelectTimeseries().run(self.orig_dataset, self.timeseries).get(0).iloc[:self.serieslength])
         result = self.algorithm.run(dataset, self.params)
         print(result.get(0))
 

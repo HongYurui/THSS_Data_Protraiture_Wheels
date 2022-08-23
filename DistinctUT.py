@@ -15,12 +15,12 @@ class DistinctUT(unittest.TestCase):
         self.orig_dataset = FlokAlgorithmLocal().read(input_paths, input_types, input_location, output_paths, output_types)
         self.algorithm = Distinct()
 
-    def test_qlb_1(self):
+    def test_distinct_1(self):
         self.timeseries = {"timeseries": "Time,s2"}
         self.serieslength = 5
         self.params = {}
 
-    def test_qlb_2(self):
+    def test_distinct_2(self):
         self.timeseries = {"timeseries": "Time,s2"}
         self.serieslength = 20
         self.params = {}
