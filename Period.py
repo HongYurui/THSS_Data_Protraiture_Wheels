@@ -5,7 +5,7 @@ from FlokAlgorithmLocal import FlokAlgorithmLocal, FlokDataFrame
 class Period(FlokAlgorithmLocal):
     def run(self, inputDataSets, params):
         input_data = inputDataSets.get(0)
-        input_data = input_data.dropna()
+        input_data = input_data.fillna("fillna")
         # header format
         value_header = 'period(' + input_data.columns[1]
         value_header += ')'

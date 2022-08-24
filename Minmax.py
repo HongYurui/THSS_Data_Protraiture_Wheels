@@ -7,6 +7,10 @@ class Minmax(FlokAlgorithmLocal):
         compute = params.get("compute", "batch")
         min = params.get("min", 0)
         max = params.get("max", 1)
+        if min > max:
+            temp = max
+            max = min
+            min = temp
 
         # header format
         value_header = 'minmax(' + input_data.columns[1]

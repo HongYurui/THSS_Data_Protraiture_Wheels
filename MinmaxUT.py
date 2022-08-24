@@ -1,4 +1,3 @@
-from math import nan
 import unittest
 from FlokAlgorithmLocal import FlokDataFrame, FlokAlgorithmLocal
 from SelectTimeseries import SelectTimeseries
@@ -28,7 +27,7 @@ class MinmaxUT(unittest.TestCase):
 
     def test_minmax_4(self):
         self.timeseries = {"timeseries": "Time,s2"}
-        self.params = {"compute": "stream", "min": -1, "max": 1}
+        self.params = {"compute": "stream", "min": 1, "max": -1}
 
     def test_minmax_5(self):
         input_paths = ["root_test_d1"]

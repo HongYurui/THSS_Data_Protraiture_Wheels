@@ -21,11 +21,11 @@ class Percentile(FlokAlgorithmLocal):
           
         data = np.array(input_data.iloc[:,1])
         data.sort()
-        i = math.ceil(rank*len(data))
+        i = math.ceil(len(data)*rank)
         if i > 1 :
             quantile = float(data[i-1])
         else :
-            quantile = float(data[0])
+            quantile = float(data[0])       
         if error==0:
             quantile = np.percentile(data, rank*100)
         else:

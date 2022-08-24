@@ -1,4 +1,3 @@
-from math import nan
 import unittest
 from FlokAlgorithmLocal import FlokDataFrame, FlokAlgorithmLocal
 from SelectTimeseries import SelectTimeseries
@@ -20,11 +19,11 @@ class PercentileUT(unittest.TestCase):
 
     def test_percentile_2(self):
         self.timeseries = {"timeseries": "Time,s1"}
-        self.params = {"rank" : 0.25}
+        self.params = {"rank" : 0.75, "error" : 0.03}
 
     def test_percentile_3(self):
         self.timeseries = {"timeseries": "Time,s2"}
-        self.params = {"rank" : 0.75, "error" : 0.02}
+        self.params = {"rank" : 0.25}
 
     def test_percentile_4(self):
         input_paths = ["root_test_d1"]

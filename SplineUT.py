@@ -24,7 +24,7 @@ class SplineUT(unittest.TestCase):
     def test_spline_2(self):
         self.timeseries = {"timeseries": "Time,s18"}
         self.serieslength = 10
-        self.params = {'points': 151}
+        self.params = {'points': 10000}
 
     def tearDown(self):
         dataset = FlokDataFrame()

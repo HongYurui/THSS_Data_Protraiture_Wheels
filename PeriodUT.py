@@ -15,22 +15,18 @@ class PeriodUT(unittest.TestCase):
         self.algorithm = Period()
 
     def test_period_1(self):
-        self.timeseries = {"timeseries": "Time,s1"}
+        self.timeseries = {"timeseries": "Time,s4"}
         self.params = {}
 
     def test_period_2(self):
-        self.timeseries = {"timeseries": "Time,s3"}
-        self.params = {}
-
-    def test_period_3(self):
-        self.timeseries = {"timeseries": "Time,s4"}
-        self.params = {}
-    
-    def test_period_4(self):
         self.timeseries = {"timeseries": "Time,s5"}
         self.params = {}
     
-    def test_period_5(self):
+    def test_period_3(self):
+        self.timeseries = {"timeseries": "Time,s7"}
+        self.params = {}
+
+    def test_period_4(self):
         input_paths = ["root_test_d1"]
         input_types = ["csv"]
         input_location = ["local_fs"]
@@ -40,6 +36,11 @@ class PeriodUT(unittest.TestCase):
         self.algorithm = Period()
         self.timeseries = {"timeseries": "Time,s12"}
         self.params = {}
+        dataset = FlokDataFrame()
+        dataset.addDF(SelectTimeseries().run(self.orif_dataset, self.timeseries).get(0).iloc[:9])
+        result = self.algorithm.run(dataset, self.params)
+        print(result.get(0))
+
 
     def tearDown(self):
         dataset = SelectTimeseries().run(self.orif_dataset, self.timeseries)
