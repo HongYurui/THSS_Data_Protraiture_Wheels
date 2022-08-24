@@ -1,3 +1,4 @@
+from math import inf
 import pandas as pd
 from FlokAlgorithmLocal import FlokAlgorithmLocal, FlokDataFrame
 
@@ -21,12 +22,6 @@ class Resample(FlokAlgorithmLocal):
         except:
             raise Exception("Invalid parameter 'every'")
 
-        interp = params.get("interp", "nan")
-        aggr = params.get("aggr", "mean")
-        start = pd.to_datetime(params.get('start'), format="%Y-%m-%d %H:%M:%S") if params.get('start') is not None else left
-        end = pd.to_datetime(params.get('end'), format="%Y-%m-%d %H:%M:%S") if params.get('end') is not None else right
-        orig_period = (time_data.iloc[-1] - time_data[0]).seconds / (len(time_data) - 1)
-
         # unit conversion
         if unit == "ms":
             period *= 0.001
@@ -38,6 +33,13 @@ class Resample(FlokAlgorithmLocal):
             period *= 3600 * 24
         elif unit != "s":
             raise Exception("Invalid unit: " + unit)
+
+        interp = params.get("interp", "nan")
+        aggr = params.get("aggr", "mean")
+        start = pd.to_datetime(params.get('start'), format="%Y-%m-%d %H:%M:%S") if params.get('start') is not None else left
+        end = pd.to_datetime(params.get('end'), format="%Y-%m-%d %H:%M:%S") if params.get('end') is not None else right
+        orig_period = (time_data.iloc[-1] - time_data[0]).seconds / (len(time_data) - 1)
+        time_data = time_data.append(pd.Series([right + 2 * pd.Timedelta(seconds=orig_period+period)], index=[len(time_data)]))
 
         # header format
         value_header = 'resample(' + input_data.columns[1]
@@ -51,7 +53,7 @@ class Resample(FlokAlgorithmLocal):
 
         timedelta = pd.Timedelta(seconds=period)
         time_tol = pd.Timedelta(milliseconds=0.001)
-
+        
         # resample function definitions
         # upsample
         if period <= orig_period:
@@ -97,10 +99,9 @@ class Resample(FlokAlgorithmLocal):
                     return orig_idx + 1, min
             elif aggr == "first":
                 def resample_func(timestamp, orig_idx):
-                    res = value_data[orig_idx]
                     while time_data[orig_idx + 1] < timestamp + time_tol:
                         orig_idx += 1
-                    return orig_idx + 1, res
+                    return orig_idx + 1, value_data[orig_idx]
             elif aggr == "last":
                 def resample_func(timestamp, orig_idx):
                     while time_data[orig_idx + 1] < timestamp + time_tol:
@@ -108,12 +109,22 @@ class Resample(FlokAlgorithmLocal):
                     return orig_idx + 1, value_data[orig_idx]
             elif aggr == "mean":
                 def resample_func(timestamp, orig_idx):
+                    # while time_data[orig_idx + 1] < timestamp + time_tol:
+                    #     orig_idx += 1
+                    # sum = 0
+                    # i = orig_idx
+                    # while time_data[i + 1] < timestamp + timedelta + time_tol:
+                    #     sum += value_data[i]
+                    #     i += 1
+                    # return orig_idx + 1, sum / (i + 1 - orig_idx)
                     sum = value_data[orig_idx]
                     count = 1
                     while time_data[orig_idx + 1] < timestamp + time_tol:
                         sum += value_data[orig_idx + 1]
+                        print(orig_idx)
                         orig_idx += 1
                         count += 1
+                    print('\n')
                     return orig_idx + 1, sum / count
             elif aggr == "median":
                 def resample_func(timestamp, orig_idx):
@@ -129,6 +140,18 @@ class Resample(FlokAlgorithmLocal):
         timestamp = start
         new_idx = 0
         orig_idx = int((start - left).total_seconds() / orig_period)
+        if orig_idx < 0:
+            orig_timestamp = timestamp
+            orig_timedelta = pd.Timedelta(seconds=orig_period)
+            while orig_idx < 0:
+                output_data.iloc[new_idx, 0] = timestamp.strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
+                output_data.iloc[new_idx, 1] = "NaN"
+                new_idx += 1
+                timestamp += timedelta
+                while orig_timestamp < timestamp + time_tol:
+                    orig_idx += 1
+                    orig_timestamp += orig_timedelta
+
         while timestamp < end + time_tol:
             output_data.iloc[new_idx, 0] = timestamp.strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
             orig_idx, output_data.iloc[new_idx, 1] = resample_func(timestamp, orig_idx)
