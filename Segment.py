@@ -2,6 +2,7 @@ from FlokAlgorithmLocal import FlokAlgorithmLocal, FlokDataFrame
 import numpy as np
 import pandas as pd
 from datetime import datetime
+from Sample import Sample
 
 
 class Segment(FlokAlgorithmLocal):
@@ -77,7 +78,11 @@ class Segment(FlokAlgorithmLocal):
                 value_header += ', \'' + param + \
                     '\'=\'' + str(params[param]) + '\''
         value_header += ')'
-        #value_header = 'segment({a},\'output\'=\'{b}\',\'error\'=\'{c}\')'.format(a=column,b=output, c=error)
+        if len(input_data) > 1000:
+            k = 10
+            step = int(len(input_data) / k)
+            for i in range(k):
+                output_data.iloc[i] = input_data.iloc[i * step]
         # 如果输入是等差数列直接输出
         if all([((output_data[column][i] - output_data[column][i-1])-(output_data[column][1] - output_data[column][0])) < 1e-10 for i in range(1, len(output_data))]):
             if output == 'all':
