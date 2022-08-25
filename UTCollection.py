@@ -31,9 +31,13 @@ from ZscoreUT import ZscoreUT
 if __name__ == "__main__":
     suite = unittest.TestSuite()
     for func in ["Acf", "Distinct", "Histogram", "Integral", "Integralavg", "Mad", "Median", "Minmax", "Mode", "Mvavg",  "Percentile", "Period", "Qlb", "Resample", "Sample", "Segment", "SelectTimeseries", "Skew", "Spline", "Spread", "Stddev", "Zscore"]:
-        for i in range(1, 100):
-            if hasattr(globals()[func + "UT"], "test_" + func.lower() + "_" + str(i)):
-                suite.addTest(globals()[func + "UT"]("test_" + func.lower() + "_" + str(i)))
+        func_ut = globals()[func + "UT"]
+        i = 1
+        while True:
+            specific_test = "test_" + func.lower() + "_" + str(i)
+            if hasattr(func_ut, specific_test):
+                suite.addTest(func_ut(specific_test))
+                i += 1
             else:
                 break
     r = unittest.TextTestRunner()
