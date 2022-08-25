@@ -355,7 +355,6 @@ class FlokAlgorithmLocal:
     def run(self, inputDataSets, params):
         print("waiting for override")
 
-
 class Hdfs():
     def __init__(self, path):
         ip = path.split(':')[1][2:]

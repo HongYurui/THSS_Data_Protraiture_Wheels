@@ -1,6 +1,6 @@
 import re
 import os
-from pandas import merge
+from pandas import merge, isna
 from pandasql import sqldf
 from FlokAlgorithmLocal import FlokAlgorithmLocal, FlokDataFrame
 from Acf import Acf
@@ -26,7 +26,6 @@ from Spline import Spline
 from Spread import Spread
 from Stddev import Stddev
 from Zscore import Zscore
-
 
 inputTypes = ['csv']
 inputLocation = ['local_fs']
@@ -60,26 +59,26 @@ while True:
     else:
         try:
             # preprocess the command by extracting patterns
-            pattern = re.findall(r"select\s+(?:\w+,\s*[\"\'](\w+)\((\w+)(?:,\s*(.*))?\)[\"\']|\w+|\*)\s*from\s+(.*?)[\s;]+.*", command)[0]
+            pattern = re.findall(r"select\s+(?:(?:\w+,\s*)?[\"\'](\w+)\((\w+)(?:,\s*(.*))?\)[\"\']|\w+|\*)\s*from\s+(.*?)(?:\s+.*|;$|$)", command)[0]
+
             # input the data
             inputPath = pattern[-1]
             inputPaths = [inputPath]
             originalInput = "orig_" + inputPath
             if originalInput not in globals().keys():
                 globals()[originalInput] = FlokAlgorithmLocal().read(inputPaths, inputTypes, inputLocation, outputPaths, outputTypes).get(0)
-                
+
             # handle queries for original data
             if pattern[0] == '':
                 globals()[inputPath] = globals()[originalInput].copy()
                 print(sqldf(command))
                 continue
-
             # handle queries for function results
             funcName = pattern[0].capitalize()
             params = dict(re.findall(r"\'(\w+)\'\s*=\s*\'([\w\s\-\.:]+)\'", pattern[2]))
             if funcName == 'Sample' and params.get('method') == 'reservoir':
                 raise Exception("Sample method 'reservoir' is not supported in SQL query due to the randomness.")
-            
+
             # renew function name and parameters
             if input_params_pairs.get(inputPath) != [funcName, params]:
                 input_params_pairs[inputPath] = [funcName, params]
@@ -88,25 +87,15 @@ while True:
 
                 # run the algorithm
                 algorithm = globals()[funcName]()
-                if funcName=='Segment':
-                    flokdataframe = FlokDataFrame()
-                    flokdataframe.addDF(
-                        globals()[originalInput].loc[:, ['Time', pattern[1]]])
-                    dataframe = algorithm.run(flokdataframe, params).get(0)
-                    if inputPath not in globals().keys():
-                        globals()[inputPath] = dataframe
-                    else:
-                        globals()[inputPath] = merge(globals()[inputPath], dataframe, on='Time')
-                else:
-                    for series in globals()[originalInput].columns[1:]:
-                        flokdataframe = FlokDataFrame()
-                        flokdataframe.addDF(globals()[originalInput].loc[:, ['Time', series]])
-                        dataframe = algorithm.run(flokdataframe, params).get(0)
-                        if inputPath not in globals().keys():
-                            globals()[inputPath] = dataframe
-                        else:                       
-                            globals()[inputPath] = merge(globals()[inputPath], dataframe, on='Time')
-            # run the SQL query
+                flokdataframe = FlokDataFrame()
+                dataframe = globals()[originalInput].loc[:, ['Time', pattern[1]]]
+                i = len(dataframe) - 1
+                while isna(dataframe.iloc[i, 1]):
+                    i -= 1
+                dataframe = dataframe.iloc[:i + 1, :]
+                flokdataframe.addDF(dataframe)
+                globals()[inputPath] = algorithm.run(flokdataframe, params).get(0)
+
             print(sqldf(command))
 
         except Exception as e:
