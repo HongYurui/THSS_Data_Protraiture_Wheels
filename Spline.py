@@ -1,7 +1,6 @@
 from FlokAlgorithmLocal import FlokAlgorithmLocal, FlokDataFrame
 import time
 import numpy as np
-from scipy.interpolate import CubicSpline
 import pandas as pd
 from datetime import datetime
 from typing import Tuple, List
@@ -9,18 +8,19 @@ import bisect
 
 
 class Spline(FlokAlgorithmLocal):
+    # 计算每个x间的差值
     def compute_changes(x: List[float]) -> List[float]:
         return [x[i+1] - x[i] for i in range(len(x) - 1)]
-
+    # 建立Px=Q中的y
     def create_tridiagonalmatrix(n: int, h: List[float]) -> Tuple[List[float], List[float], List[float]]:
         A = [h[i] / (h[i] + h[i + 1]) for i in range(n - 2)] + [0]
         B = [2] * n
         C = [0] + [h[i + 1] / (h[i] + h[i + 1]) for i in range(n - 2)]
         return A, B, C
-
+    # Px=Q右边的Q
     def create_target(n: int, h: List[float], y: List[float]):
         return [0] + [6 * ((y[i + 1] - y[i]) / h[i] - (y[i] - y[i - 1]) / h[i - 1]) / (h[i] + h[i-1]) for i in range(1, n - 1)] + [0]
-
+    # 解Px=Q
     def solve_tridiagonalsystem(A: List[float], B: List[float], C: List[float], D: List[float]):
         c_p = C + [0]
         d_p = [0] * len(B)
@@ -38,11 +38,11 @@ class Spline(FlokAlgorithmLocal):
             X[i] = d_p[i] - c_p[i] * X[i + 1]
 
         return X
-
+    #计算
     def compute_spline(x: List[float], y: List[float]):
         n = len(x)
         if n < 3:
-            raise ValueError('Too short an array')
+            raise ValueError('The array is too short')
         if n != len(y):
             raise ValueError('Array lengths are different')
 
@@ -81,14 +81,9 @@ class Spline(FlokAlgorithmLocal):
                 Time.append(time.mktime(time.strptime(
                     output_data['Time'][i], "%Y-%m-%d %H:%M:%S"))-time0)
             value = output_data[column]
-            # （t，c，k）包含节点向量、B样条曲线系数和样条曲线阶数的元组。
-            #tck = interpolate.splrep(Time, value, k=3)
-            #c = CubicSpline(Time, value, bc_type=((1, 4.9), (1, 9.9)))
             spline = Spline.compute_spline(Time, value)
             x = (np.linspace(min(Time), max(Time), points)).tolist()
             y = [spline(t) for t in x]
-            # y=list(c(x))
-            #y = (interpolate.splev(x, tck, der=0)).tolist()
             for i in range(0, len(x)):
                 x[i] = datetime.fromtimestamp(x[i])
                 # print(type(x[i]))
@@ -103,59 +98,3 @@ class Spline(FlokAlgorithmLocal):
         result = FlokDataFrame()
         result.addDF(output_data)
         return result
-
-
-if __name__ == "__main__":
-    algorithm = Spline()
-    all_info_1 = {
-        "input": ["./test_in.csv"],
-        "inputFormat": ["csv"],
-        "inputLocation": ["local_fs"],
-        "output": ["./test_out_1.csv"],
-        "outputFormat": ["csv"],
-        "outputLocation": ["local_fs"],
-        "parameters": {'points': 150}
-    }
-
-    params = all_info_1["parameters"]
-    inputPaths = all_info_1["input"]
-    inputTypes = all_info_1["inputFormat"]
-    inputLocation = all_info_1["inputLocation"]
-    outputPaths = all_info_1["output"]
-    outputTypes = all_info_1["outputFormat"]
-    outputLocation = all_info_1["outputLocation"]
-
-    dataSet = algorithm.read(inputPaths, inputTypes,
-                             inputLocation, outputPaths, outputTypes)
-    from SelectTimeseries import SelectTimeseries
-    dataSet = SelectTimeseries().run(
-        dataSet, {"timeseries": "Time,root.test.d2.s2"})
-    result = algorithm.run(dataSet, params)
-    algorithm.write(outputPaths, result, outputTypes, outputLocation)
-    '''
-    all_info_2 = {
-        "input": ["./test_in.csv"],
-        "inputFormat": ["csv"],
-        "inputLocation": ["local_fs"],
-        "output": ["./test_out_2.csv"],
-        "outputFormat": ["csv"],
-        "outputLocation": ["local_fs"],
-        "parameters": {'points':200}
-    }
-
-    params = all_info_2["parameters"]
-    inputPaths = all_info_2["input"]
-    inputTypes = all_info_2["inputFormat"]
-    inputLocation = all_info_2["inputLocation"]
-    outputPaths = all_info_2["output"]
-    outputTypes = all_info_2["outputFormat"]
-    outputLocation = all_info_2["outputLocation"]
-
-    dataSet = algorithm.read(inputPaths, inputTypes,
-                             inputLocation, outputPaths, outputTypes)
-    from SelectTimeseries import SelectTimeseries
-    dataSet = SelectTimeseries().run(
-        dataSet, {"timeseries": "Time,root.test.d2.s2"})
-    result = algorithm.run(dataSet, params)
-    algorithm.write(outputPaths, result, outputTypes, outputLocation)
-    '''

@@ -7,7 +7,7 @@ from Stddev import Stddev
 class StddevUT(unittest.TestCase):
 
     def setUp(self):
-        input_paths = ["root_test_d1"]
+        input_paths = ["root_test_d2"]
         input_types = ["csv"]
         input_location = ["local_fs"]
         output_paths = ["root_test_d1_out.csv"]
@@ -23,7 +23,7 @@ class StddevUT(unittest.TestCase):
 
     def test_stddev_2(self):
         self.timeseries = {"timeseries": "Time,s20"}
-        self.serieslength = 10
+        self.serieslength = 2500
         self.params = {}
 
     def tearDown(self):

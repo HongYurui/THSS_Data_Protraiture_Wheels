@@ -7,7 +7,7 @@ from Spread import Spread
 class SpreadUT(unittest.TestCase):
 
     def setUp(self):
-        input_paths = ["root_test_d1"]
+        input_paths = ["root_test_d2"]
         input_types = ["csv"]
         input_location = ["local_fs"]
         output_paths = ["root_test_d1_out.csv"]
@@ -23,7 +23,7 @@ class SpreadUT(unittest.TestCase):
 
     def test_spread_2(self):
         self.timeseries = {"timeseries": "Time,s19"}
-        self.serieslength = 4
+        self.serieslength = 10000
         self.params = {}
 
     def tearDown(self):

@@ -3,7 +3,6 @@ from FlokAlgorithmLocal import FlokAlgorithmLocal, FlokDataFrame
 import numpy as np
 import pandas as pd
 from datetime import datetime
-from Sample import Sample
 
 
 class Segment(FlokAlgorithmLocal):
@@ -67,6 +66,7 @@ class Segment(FlokAlgorithmLocal):
     def run(self, inputDataSets, params):
         input_data = inputDataSets.get(0)
         output_data = input_data
+        output_data.dropna(inplace=True)
         column = input_data.columns[1]
         output = params.get("output", 'first')
         error = params.get("error", 0.1)
@@ -79,11 +79,13 @@ class Segment(FlokAlgorithmLocal):
                 value_header += ', \'' + param + \
                     '\'=\'' + str(params[param]) + '\''
         value_header += ')'
-        if len(input_data) > 1000:
-            k = 10
+        #数据过多则等距采样
+        if len(input_data) > 10000:
+            k = 1000
             step = int(len(input_data) / k)
             for i in range(k):
                 output_data.iloc[i] = input_data.iloc[i * step]
+            output_data=output_data.iloc[:k]
         # 如果输入是等差数列直接输出
         if all([((output_data[column][i] - output_data[column][i-1])-(output_data[column][1] - output_data[column][0])) < 1e-10 for i in range(1, len(output_data))]):
             if output == 'all':
@@ -122,57 +124,3 @@ class Segment(FlokAlgorithmLocal):
         result = FlokDataFrame()
         result.addDF(output_data)
         return result
-
-
-if __name__ == "__main__":
-    algorithm = Segment()
-
-    all_info_1 = {
-        "input": ["./test_in.csv"],
-        "inputFormat": ["csv"],
-        "inputLocation": ["local_fs"],
-        "output": ["./test_out_1.csv"],
-        "outputFormat": ["csv"],
-        "outputLocation": ["local_fs"],
-        "parameters": {'output': 'all', 'error': 0.1}
-    }
-
-    params = all_info_1["parameters"]
-    inputPaths = all_info_1["input"]
-    inputTypes = all_info_1["inputFormat"]
-    inputLocation = all_info_1["inputLocation"]
-    outputPaths = all_info_1["output"]
-    outputTypes = all_info_1["outputFormat"]
-    outputLocation = all_info_1["outputLocation"]
-
-    dataSet = algorithm.read(inputPaths, inputTypes,
-                             inputLocation, outputPaths, outputTypes)
-    from SelectTimeseries import SelectTimeseries
-    dataSet = SelectTimeseries().run(
-        dataSet, {"timeseries": "Time,root.test.d2.s2"})
-    result = algorithm.run(dataSet, params)
-    algorithm.write(outputPaths, result, outputTypes, outputLocation)
-'''
-    all_info_2 = {
-        "input": ["./test_in.csv"],
-        "inputFormat": ["csv"],
-        "inputLocation": ["local_fs"],
-        "output": ["./test_out_2.csv"],
-        "outputFormat": ["csv"],
-        "outputLocation": ["local_fs"],
-        "parameters": {"timeseries": "Time,root.test.d2.s2",'output':'first','error':0.1}
-    }
-
-    params = all_info_2["parameters"]
-    inputPaths = all_info_2["input"]
-    inputTypes = all_info_2["inputFormat"]
-    inputLocation = all_info_2["inputLocation"]
-    outputPaths = all_info_2["output"]
-    outputTypes = all_info_2["outputFormat"]
-    outputLocation = all_info_2["outputLocation"]
-
-    dataSet = algorithm.read(inputPaths, inputTypes,
-                             inputLocation, outputPaths, outputTypes)
-    result = algorithm.run(dataSet, params)
-    algorithm.write(outputPaths, result, outputTypes, outputLocation)
-'''

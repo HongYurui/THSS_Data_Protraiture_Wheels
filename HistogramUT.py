@@ -7,7 +7,7 @@ from Histogram import Histogram
 class HistogramUT(unittest.TestCase):
 
     def setUp(self):
-        input_paths = ["root_test_d1"]
+        input_paths = ["root_test_d2"]
         input_types = ["csv"]
         input_location = ["local_fs"]
         output_paths = ["root_test_d1_out.csv"]
@@ -22,8 +22,8 @@ class HistogramUT(unittest.TestCase):
 
     def test_histogram_2(self):
         self.timeseries = {"timeseries": "Time,s3"}
-        self.serieslength = 20
-        self.params = {"min": "5", "count": "7"}
+        self.serieslength = 2500
+        self.params = {"min": "5", "count": "10"}
 
     def tearDown(self):
         dataset = FlokDataFrame()

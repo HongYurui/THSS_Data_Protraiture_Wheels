@@ -35,27 +35,3 @@ class Minmax(FlokAlgorithmLocal):
         result.addDF(output_data)
         return result
         
-if __name__ == "__main__":
-    algorithm = Minmax()
-
-    all_info_1 = {
-        "input": ["./test_in.csv"],
-        "inputFormat": ["csv"],
-        "inputLocation": ["local_fs"],
-        "output": ["./test_out_1.csv"],
-        "outputFormat": ["csv"],
-        "outputLocation": ["local_fs"],
-        "parameters": {"compute": "batch", "min" : 0, "max" : 1}
-    }
-
-    params = all_info_1["parameters"]
-    inputPaths = all_info_1["input"]
-    inputTypes = all_info_1["inputFormat"]
-    inputLocation = all_info_1["inputLocation"]
-    outputPaths = all_info_1["output"]
-    outputTypes = all_info_1["outputFormat"]
-    outputLocation = all_info_1["outputLocation"]
-
-    dataSet = algorithm.read(inputPaths, inputTypes, inputLocation, outputPaths, outputTypes)
-    result = algorithm.run(dataSet, params)
-    algorithm.write(outputPaths, result, outputTypes, outputLocation)

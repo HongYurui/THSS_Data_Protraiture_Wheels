@@ -7,7 +7,7 @@ from Acf import Acf
 class AcfUT(unittest.TestCase):
 
     def setUp(self):
-        input_paths = ["root_test_d1"]
+        input_paths = ["./root_test_d2.csv"]#use a large thing
         input_types = ["csv"]
         input_location = ["local_fs"]
         output_paths = ["root_test_d1_out.csv"]
@@ -18,6 +18,10 @@ class AcfUT(unittest.TestCase):
     def test_acf_1(self):
         self.timeseries = {"timeseries": "Time,s1"}
         self.serieslength = 5
+        self.params = {}
+    def test_acf_2(self):
+        self.timeseries = {"timeseries": "Time,s16"}
+        self.serieslength = 2500
         self.params = {}
 
     def tearDown(self):
