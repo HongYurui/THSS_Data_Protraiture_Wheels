@@ -78,8 +78,8 @@ class Segment(FlokAlgorithmLocal):
                 value_header += ', \'' + param + \
                     '\'=\'' + str(params[param]) + '\''
         value_header += ')'
-        if len(input_data) > 1000:
-            k = 10
+        if len(input_data) > 10000:
+            k = 5000
             step = int(len(input_data) / k)
             for i in range(k):
                 output_data.iloc[i] = input_data.iloc[i * step]
