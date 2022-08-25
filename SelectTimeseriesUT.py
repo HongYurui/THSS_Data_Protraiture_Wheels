@@ -1,83 +1,33 @@
 import unittest
-import select
-
+from FlokAlgorithmLocal import FlokDataFrame, FlokAlgorithmLocal
 from SelectTimeseries import SelectTimeseries
-from Acf import Acf
-from Distinct import Distinct
-from Histogram import Histogram
 
 
 class SelectTimeseriesUT(unittest.TestCase):
-
     def setUp(self):
-        pass
+        input_paths = ["root_test_d1"]
+        input_types = ["csv"]
+        input_location = ["local_fs"]
+        output_paths = ["root_test_d1_out.csv"]
+        output_types = ["csv"]
+        self.orig_dataset = FlokAlgorithmLocal().read(input_paths, input_types, input_location, output_paths, output_types)
+        self.algorithm = SelectTimeseries()
 
-    def test_SelectTimeseries_1(self):
-        print('SelectTimeseries测试场景1')
-        
-        all_info_1 = {
-            "input": ["./test_in.csv"],
-            "inputFormat": ["csv"],
-            "inputLocation": ["local_fs"],
-            "output": ["./test_out_1.csv"],
-            "outputFormat": ["csv"],
-            "outputLocation": ["local_fs"],
-            "parameters": {}
-        }
+    def test_sample_1(self):
+        self.timeseries = {}
+        self.serieslength = 40
+        self.params = {"timeseries": "Time,s1"}
 
-        params = all_info_1["parameters"]
-        inputPaths = all_info_1["input"]
-        inputTypes = all_info_1["inputFormat"]
-        inputLocation = all_info_1["inputLocation"]
-        outputPaths = all_info_1["output"]
-        outputTypes = all_info_1["outputFormat"]
-        outputLocation = all_info_1["outputLocation"]
-        #每次更改部分参数
-        #acf
-        algorithm = Acf()
-        all_info_1['output'] = ["./test_out_1_acf.csv"]
-        params = all_info_1["parameters"]
-        outputPaths = all_info_1["output"]
-        #print(all_info_1)
-        dataSet = algorithm.read(inputPaths, inputTypes,
-                                inputLocation, outputPaths, outputTypes)
-        dataSet = SelectTimeseries().run(
-            dataSet, {"timeseries": "Time,root.test.d2.s2"})
-        result = algorithm.run(dataSet, params)
-        algorithm.write(outputPaths, result, outputTypes, outputLocation)
-        #distinct
-        algorithm = Distinct()
-        all_info_1['output'] = ["./test_out_1_distinct.csv"]
-        params = all_info_1["parameters"]
-        outputPaths = all_info_1["output"]
-        #print(all_info_1)
-        dataSet = algorithm.read(inputPaths, inputTypes,
-                                 inputLocation, outputPaths, outputTypes)
-        dataSet = SelectTimeseries().run(
-            dataSet, {"timeseries": "Time,root.test.d2.s2"})
-        result = algorithm.run(dataSet, params)
-        algorithm.write(outputPaths, result, outputTypes, outputLocation)
-        #histogram
-        algorithm = Histogram()
-        all_info_1['output'] = ["./test_out_1_histogram.csv"]
-        all_info_1['parameters'] = {"min": 1, "max_": 20, "count": 10}
-        params = all_info_1["parameters"]
-        outputPaths = all_info_1["output"]
-        #print(all_info_1)
-        dataSet = algorithm.read(inputPaths, inputTypes,
-                                 inputLocation, outputPaths, outputTypes)
-        dataSet = SelectTimeseries().run(
-            dataSet, {"timeseries": "Time,root.test.d2.s2"})
-        result = algorithm.run(dataSet, params)
-        algorithm.write(outputPaths, result, outputTypes, outputLocation)
-        pass
-
-    def test_SelectTimeseries_2(self):
-        print('SelectTimeseries测试场景2')
-        pass
+    def test_sample_2(self):
+        self.timeseries = {}
+        self.serieslength = 40
+        self.params = {"timeseries": "Time,s1,s3,s5"}
 
     def tearDown(self):
-        pass
+        dataset = FlokDataFrame()
+        dataset.addDF(self.orig_dataset.get(0))
+        result = self.algorithm.run(dataset, self.params)
+        print(result.get(0))
 
 
 if __name__ == "__main__":
