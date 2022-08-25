@@ -59,7 +59,7 @@ while True:
     else:
         try:
             # preprocess the command by extracting patterns
-            pattern = re.findall(r"select\s+(?:\w+,\s*[\"\'](\w+)\((\w+)(?:,\s*(.*))?\)[\"\']|\w+|\*)\s*from\s+(.*?)(?:\s+.*|;$|$)", command)[0]
+            pattern = re.findall(r"select\s+(?:(?:\w+,\s*)?[\"\'](\w+)\((\w+)(?:,\s*(.*))?\)[\"\']|\w+|\*)\s*from\s+(.*?)(?:\s+.*|;$|$)", command)[0]
 
             # input the data
             inputPath = pattern[-1]

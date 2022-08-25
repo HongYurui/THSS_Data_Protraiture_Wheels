@@ -54,7 +54,7 @@ class Resample(FlokAlgorithmLocal):
 
         timedelta = pd.Timedelta(seconds=period)
         time_tol = pd.Timedelta(milliseconds=0.001)
-        
+
         # resample function definitions
         # upsample
         if period <= orig_period:
@@ -110,21 +110,12 @@ class Resample(FlokAlgorithmLocal):
                     return orig_idx + 1, value_data[orig_idx]
             elif aggr == "mean":
                 def resample_func(timestamp, orig_idx):
-                    # while time_data[orig_idx + 1] < timestamp + time_tol:
-                    #     orig_idx += 1
-                    # sum = 0
-                    # i = orig_idx
-                    # while time_data[i + 1] < timestamp + timedelta + time_tol:
-                    #     sum += value_data[i]
-                    #     i += 1
-                    # return orig_idx + 1, sum / (i + 1 - orig_idx)
                     sum = value_data[orig_idx]
-                    count = 1
-                    while time_data[orig_idx + 1] < timestamp + time_tol:
+                    mark = orig_idx
+                    while time_data[orig_idx + 1] < timestamp + timedelta - time_tol:
                         sum += value_data[orig_idx + 1]
                         orig_idx += 1
-                        count += 1
-                    return orig_idx + 1, sum / count
+                    return orig_idx + 1, sum / (orig_idx + 1 - mark)
             elif aggr == "median":
                 def resample_func(timestamp, orig_idx):
                     data = [value_data[orig_idx]]
@@ -147,7 +138,7 @@ class Resample(FlokAlgorithmLocal):
                 output_data.iloc[new_idx, 1] = "NaN"
                 new_idx += 1
                 timestamp += timedelta
-                while orig_timestamp < timestamp + time_tol:
+                while orig_timestamp < timestamp - time_tol:
                     orig_idx += 1
                     orig_timestamp += orig_timedelta
 
@@ -163,52 +154,3 @@ class Resample(FlokAlgorithmLocal):
         result = FlokDataFrame()
         result.addDF(output_data)
         return result
-
-if __name__ == "__main__":
-    algorithm = Resample()
-
-    all_info_1 = {
-        "input": ["root_test_d1"],
-        "inputFormat": ["csv"],
-        "inputLocation": ["local_fs"],
-        "output": ["./test_out_1.csv"],
-        "outputFormat": ["csv"],
-        "outputLocation": ["local_fs"],
-        "parameters": {'every': '1.0s', 'interp': 'BFill', 'aggr': 'Min', "start": "2022-01-01 00:00:02", "end": "2022-01-01 00:00:05"}
-    }
-
-    params = all_info_1["parameters"]
-    inputPaths = all_info_1["input"]
-    inputTypes = all_info_1["inputFormat"]
-    inputLocation = all_info_1["inputLocation"]
-    outputPaths = all_info_1["output"]
-    outputTypes = all_info_1["outputFormat"]
-    outputLocation = all_info_1["outputLocation"]
-
-    dataSet = algorithm.read(inputPaths, inputTypes, inputLocation, outputPaths, outputTypes)
-    from SelectTimeseries import SelectTimeseries
-    dataSet = SelectTimeseries().run(dataSet, {"timeseries": "Time,s2"})
-    result = algorithm.run(dataSet, params)
-    algorithm.write(outputPaths, result, outputTypes, outputLocation)
-
-    # all_info_2 = {
-    #     "input": ["./test_in.csv"],
-    #     "inputFormat": ["csv"],
-    #     "inputLocation": ["local_fs"],
-    #     "output": ["./test_out_2.csv"],
-    #     "outputFormat": ["csv"],
-    #     "outputLocation": ["local_fs"],
-    #     "parameters": {"timeseries": "Time,root.test.d2.s2"}
-    # }
-
-    # params = all_info_2["parameters"]
-    # inputPaths = all_info_2["input"]
-    # inputTypes = all_info_2["inputFormat"]
-    # inputLocation = all_info_2["inputLocation"]
-    # outputPaths = all_info_2["output"]
-    # outputTypes = all_info_2["outputFormat"]
-    # outputLocation = all_info_2["outputLocation"]
-
-    # dataSet = algorithm.read(inputPaths, inputTypes, inputLocation, outputPaths, outputTypes)
-    # result = algorithm.run(dataSet, params)
-    # algorithm.write(outputPaths, result, outputTypes, outputLocation)
