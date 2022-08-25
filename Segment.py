@@ -3,7 +3,6 @@ from FlokAlgorithmLocal import FlokAlgorithmLocal, FlokDataFrame
 import numpy as np
 import pandas as pd
 from datetime import datetime
-from Sample import Sample
 
 
 class Segment(FlokAlgorithmLocal):
@@ -67,6 +66,7 @@ class Segment(FlokAlgorithmLocal):
     def run(self, inputDataSets, params):
         input_data = inputDataSets.get(0)
         output_data = input_data
+        output_data.dropna(inplace=True)
         column = input_data.columns[1]
         output = params.get("output", 'first')
         error = params.get("error", 0.1)
@@ -79,11 +79,13 @@ class Segment(FlokAlgorithmLocal):
                 value_header += ', \'' + param + \
                     '\'=\'' + str(params[param]) + '\''
         value_header += ')'
+        #数据过多则等距采样
         if len(input_data) > 10000:
-            k = 5000
+            k = 1000
             step = int(len(input_data) / k)
             for i in range(k):
                 output_data.iloc[i] = input_data.iloc[i * step]
+            output_data=output_data.iloc[:k]
         # 如果输入是等差数列直接输出
         if all([((output_data[column][i] - output_data[column][i-1])-(output_data[column][1] - output_data[column][0])) < 1e-10 for i in range(1, len(output_data))]):
             if output == 'all':
@@ -128,7 +130,7 @@ if __name__ == "__main__":
     algorithm = Segment()
 
     all_info_1 = {
-        "input": ["./test_in.csv"],
+        "input": ["root_test_d2"],
         "inputFormat": ["csv"],
         "inputLocation": ["local_fs"],
         "output": ["./test_out_1.csv"],
@@ -149,7 +151,7 @@ if __name__ == "__main__":
                              inputLocation, outputPaths, outputTypes)
     from SelectTimeseries import SelectTimeseries
     dataSet = SelectTimeseries().run(
-        dataSet, {"timeseries": "Time,root.test.d2.s2"})
+        dataSet, {"timeseries": "Time,s16"})
     result = algorithm.run(dataSet, params)
     algorithm.write(outputPaths, result, outputTypes, outputLocation)
 '''

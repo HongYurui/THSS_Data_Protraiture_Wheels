@@ -7,7 +7,7 @@ from Spline import Spline
 class SplineUT(unittest.TestCase):
 
     def setUp(self):
-        input_paths = ["root_test_d1"]
+        input_paths = ["root_test_d2"]
         input_types = ["csv"]
         input_location = ["local_fs"]
         output_paths = ["root_test_d1_out.csv"]
@@ -24,7 +24,7 @@ class SplineUT(unittest.TestCase):
     def test_spline_2(self):
         self.timeseries = {"timeseries": "Time,s18"}
         self.serieslength = 10
-        self.params = {'points': 10000}
+        self.params = {'points': 100000}
 
     def tearDown(self):
         dataset = FlokDataFrame()

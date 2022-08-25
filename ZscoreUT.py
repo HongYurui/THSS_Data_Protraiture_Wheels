@@ -7,7 +7,7 @@ from Zscore import Zscore
 class ZscoreUT(unittest.TestCase):
 
     def setUp(self):
-        input_paths = ["root_test_d1"]
+        input_paths = ["root_test_d2"]
         input_types = ["csv"]
         input_location = ["local_fs"]
         output_paths = ["root_test_d1_out.csv"]
@@ -18,7 +18,7 @@ class ZscoreUT(unittest.TestCase):
 
     def test_zscore_1(self):
         self.timeseries = {"timeseries": "Time,s22"}
-        self.serieslength = 20
+        self.serieslength = 2500
         self.params = {}
 
     def test_zscore_2(self):

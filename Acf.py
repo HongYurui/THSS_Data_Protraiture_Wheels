@@ -4,9 +4,8 @@ import pandas as pd
 import time
 from datetime import datetime
 
-
 class Acf(FlokAlgorithmLocal):
-    def run_acf(x, end_value):
+    def run_acf(x):
         len_x = len(x)
         q = ([0]*len_x)
         p = []
@@ -15,19 +14,24 @@ class Acf(FlokAlgorithmLocal):
             if len(q) < len_x:
                 q += [0]*(len_x-len(q))
             p.append(np.dot(q, x))
-        p.reverse()
-        for i in range(0, len_x-1):
-            p.append(p[len_x-2-i])
-        return list(p/end_value)
+        #wp.reverse()
+        for i in range(1, len_x):
+            p.insert(i-1,p[-i])
+            #p.append(p[len_x-2-i])
+        return list(p)
 
     def run(self, inputDataSets, params):
         input_data = inputDataSets.get(0)
         output_data = input_data
         column = input_data.columns[1]
         output_data.fillna(0, inplace=True)
+        output_data.dropna(axis=0,inplace=True)
         value = output_data[column]
         end_value = output_data[column].values[-1]
-        acf_value = Acf.run_acf(list(value), end_value)
+        if end_value:
+            acf_value = list(Acf.run_acf(list(value))/end_value)
+        else:
+            acf_value = Acf.run_acf(list(value))
         Time = []
         for i in range(0, 2*len(value)-1):
             q = datetime.fromtimestamp((i+1)/1000.0)
@@ -43,55 +47,3 @@ class Acf(FlokAlgorithmLocal):
         return result
 
 
-if __name__ == "__main__":
-    algorithm = Acf()
-
-    all_info_1 = {
-        "input": ["./test_in.csv"],
-        "inputFormat": ["csv"],
-        "inputLocation": ["local_fs"],
-        "output": ["./test_out_1.csv"],
-        "outputFormat": ["csv"],
-        "outputLocation": ["local_fs"],
-        "parameters": {}
-    }
-
-    params = all_info_1["parameters"]
-    inputPaths = all_info_1["input"]
-    inputTypes = all_info_1["inputFormat"]
-    inputLocation = all_info_1["inputLocation"]
-    outputPaths = all_info_1["output"]
-    outputTypes = all_info_1["outputFormat"]
-    outputLocation = all_info_1["outputLocation"]
-
-    dataSet = algorithm.read(inputPaths, inputTypes,
-                             inputLocation, outputPaths, outputTypes)
-    from SelectTimeseries import SelectTimeseries
-    dataSet = SelectTimeseries().run(
-        dataSet, {"timeseries": "Time,root.test.d2.s2"})
-    result = algorithm.run(dataSet, params)
-    algorithm.write(outputPaths, result, outputTypes, outputLocation)
-    '''
-    all_info_2 = {
-        "input": ["root_test_d1"],
-        "inputFormat": ["csv"],
-        "inputLocation": ["local_fs"],
-        "output": ["./test_out_2.csv"],
-        "outputFormat": ["csv"],
-        "outputLocation": ["local_fs"],
-        "parameters": {"timeseries": "Time,s2"}
-    }
-
-    params = all_info_2["parameters"]
-    inputPaths = all_info_2["input"]
-    inputTypes = all_info_2["inputFormat"]
-    inputLocation = all_info_2["inputLocation"]
-    outputPaths = all_info_2["output"]
-    outputTypes = all_info_2["outputFormat"]
-    outputLocation = all_info_2["outputLocation"]
-
-    dataSet = algorithm.read(inputPaths, inputTypes,
-                             inputLocation, outputPaths, outputTypes)
-    result = algorithm.run(dataSet, params)
-    algorithm.write(outputPaths, result, outputTypes, outputLocation)
-    '''
