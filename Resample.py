@@ -39,7 +39,8 @@ class Resample(FlokAlgorithmLocal):
         start = pd.to_datetime(params.get('start'), format="%Y-%m-%d %H:%M:%S") if params.get('start') is not None else left
         end = pd.to_datetime(params.get('end'), format="%Y-%m-%d %H:%M:%S") if params.get('end') is not None else right
         orig_period = (time_data.iloc[-1] - time_data[0]).seconds / (len(time_data) - 1)
-        time_data = time_data.append(pd.Series([right + 2 * pd.Timedelta(seconds=orig_period+period)], index=[len(time_data)]))
+        data_length = len(time_data)
+        time_data = time_data.append(pd.Series([right + 2 * pd.Timedelta(seconds=orig_period+period)], index=[data_length]))
 
         # header format
         value_header = 'resample(' + input_data.columns[1]
@@ -121,10 +122,8 @@ class Resample(FlokAlgorithmLocal):
                     count = 1
                     while time_data[orig_idx + 1] < timestamp + time_tol:
                         sum += value_data[orig_idx + 1]
-                        print(orig_idx)
                         orig_idx += 1
                         count += 1
-                    print('\n')
                     return orig_idx + 1, sum / count
             elif aggr == "median":
                 def resample_func(timestamp, orig_idx):
@@ -154,7 +153,10 @@ class Resample(FlokAlgorithmLocal):
 
         while timestamp < end + time_tol:
             output_data.iloc[new_idx, 0] = timestamp.strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
-            orig_idx, output_data.iloc[new_idx, 1] = resample_func(timestamp, orig_idx)
+            if orig_idx < data_length:
+                orig_idx, output_data.iloc[new_idx, 1] = resample_func(timestamp, orig_idx)
+            else:
+                output_data.iloc[new_idx, 1] = "NaN"
             timestamp += timedelta
             new_idx += 1
 
@@ -172,7 +174,7 @@ if __name__ == "__main__":
         "output": ["./test_out_1.csv"],
         "outputFormat": ["csv"],
         "outputLocation": ["local_fs"],
-        "parameters": {'every': '1.0s', 'interp': 'BFill', 'aggr': 'Min', "start": "2022-01-01 00:00:02", "end": "2022-01-01 00:00:08"}
+        "parameters": {'every': '1.0s', 'interp': 'BFill', 'aggr': 'Min', "start": "2022-01-01 00:00:02", "end": "2022-01-01 00:00:05"}
     }
 
     params = all_info_1["parameters"]
