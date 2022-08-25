@@ -13,12 +13,12 @@ class SelectTimeseriesUT(unittest.TestCase):
         self.orig_dataset = FlokAlgorithmLocal().read(input_paths, input_types, input_location, output_paths, output_types)
         self.algorithm = SelectTimeseries()
 
-    def test_sample_1(self):
+    def test_selecttimeseries_1(self):
         self.timeseries = {}
         self.serieslength = 40
         self.params = {"timeseries": "Time,s1"}
 
-    def test_sample_2(self):
+    def test_selecttimeseries_2(self):
         self.timeseries = {}
         self.serieslength = 40
         self.params = {"timeseries": "Time,s1,s3,s5"}
