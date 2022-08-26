@@ -18,24 +18,28 @@ class PacfUT(unittest.TestCase):
         self.params = {"lag": 2}
         dataset = SelectTimeseries().run(self.orif_dataset, self.timeseries)
         result = self.algorithm.run(dataset, self.params)
+        print(result.get(0))
 
     def test_pacf_2(self):
         self.timeseries = {"timeseries": "Time,s2"}
         self.params = {}
         dataset = SelectTimeseries().run(self.orif_dataset, self.timeseries)
         result = self.algorithm.run(dataset, self.params)
+        print(result.get(0))
 
     def test_pacf_3(self):
         self.timeseries = {"timeseries": "Time,s2"}
         self.params = {"lag": 8}
         dataset = SelectTimeseries().run(self.orif_dataset, self.timeseries)
         result = self.algorithm.run(dataset, self.params)
+        print(result.get(0))
     
     def test_pacf_4(self):
         self.timeseries = {"timeseries": "Time,s2"}
         self.params = {"lag": -1}
         dataset = SelectTimeseries().run(self.orif_dataset, self.timeseries)
         result = self.algorithm.run(dataset, self.params)
+        print(result.get(0))
     
     def test_pacf_5(self):
         self.timeseries = {"timeseries": "Time,s6"}
@@ -43,6 +47,7 @@ class PacfUT(unittest.TestCase):
         dataset = FlokDataFrame()
         dataset.addDF(SelectTimeseries().run(self.orif_dataset, self.timeseries).get(0).iloc[:4])
         result = self.algorithm.run(dataset, self.params)
+        print(result.get(0))
 
     def test_pacf_6(self):
         input_paths = ["../data/root_test_d1"]
@@ -57,6 +62,7 @@ class PacfUT(unittest.TestCase):
         dataset = FlokDataFrame()
         dataset.addDF(SelectTimeseries().run(self.orif_dataset, self.timeseries).get(0).iloc[:20])
         result = self.algorithm.run(dataset, self.params)
+        print(result.get(0))
 
     def tearDown(self):
         pass
