@@ -24,13 +24,9 @@ from SpreadUT import SpreadUT
 from StddevUT import StddevUT
 from ZscoreUT import ZscoreUT
 
-"""
-"Pacf",
-"""
-
 if __name__ == "__main__":
     suite = unittest.TestSuite()
-    for func in ["Acf", "Distinct", "Histogram", "Integral", "Integralavg", "Mad", "Median", "Minmax", "Mode", "Mvavg",  "Percentile", "Period", "Qlb", "Resample", "Sample", "Segment", "SelectTimeseries", "Skew", "Spline", "Spread", "Stddev", "Zscore"]:
+    for func in ["Acf", "Distinct", "Histogram", "Integral", "Integralavg", "Mad", "Median", "Minmax", "Mode", "Mvavg",  "Pacf", "Percentile", "Period", "Qlb", "Resample", "Sample", "Segment", "SelectTimeseries", "Skew", "Spline", "Spread", "Stddev", "Zscore"]:
         func_ut = globals()[func + "UT"]
         i = 1
         while True:
