@@ -17,6 +17,8 @@ class Histogram(FlokAlgorithmLocal):
             max_num = float(max_num)
         if isinstance(count, str):
             count = int(count)
+        if count < 1:
+            raise ValueError("count must be bigger than or equal to 1")
         value_header = 'histogram(' + column
         param_list = ['min', 'max', 'count']
         for param in param_list:

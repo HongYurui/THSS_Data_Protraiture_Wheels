@@ -18,6 +18,8 @@ class Zscore(FlokAlgorithmLocal):
                 avg = float(avg)
             if isinstance(std, str):
                 std = float(std)
+            if std == 0 :
+                raise ValueError("std must not be 0")
             output_data[column] = (output_data[column]-avg)/std
             j = 'zscore({},\'compute\'=\'{}\',\'avg\'=\'{}\',\'std\'=\'{}\')'.format(
                 column, compute,avg, std)
