@@ -63,7 +63,7 @@ while True:
 
             # input the data
             inputPath = pattern[-1]
-            inputPaths = [inputPath]
+            inputPaths = ["../data/" + inputPath]
             originalInput = "orig_" + inputPath
             if originalInput not in globals().keys():
                 globals()[originalInput] = FlokAlgorithmLocal().read(inputPaths, inputTypes, inputLocation, outputPaths, outputTypes).get(0)
