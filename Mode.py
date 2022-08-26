@@ -1,4 +1,3 @@
-from datetime import datetime
 from math import nan
 import pandas as pd
 from FlokAlgorithmLocal import FlokAlgorithmLocal, FlokDataFrame
@@ -21,7 +20,7 @@ class Mode(FlokAlgorithmLocal):
         else:
             mode = input_data.iloc[:, 1].mode()[0]
         output_data.iloc[0, 1] = mode
-        output_data.iloc[0, 0] = datetime.strptime('1970-01-01 08:00:00', "%Y-%m-%d %H:%M:%S").strftime("%Y-%m-%d 08:00:00")
+        output_data.iloc[0, 0] = '1970-01-01 08:00:00.000'
         
         result = FlokDataFrame()
         result.addDF(output_data)

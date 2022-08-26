@@ -1,4 +1,3 @@
-from datetime import datetime
 import pandas as pd
 from FlokAlgorithmLocal import FlokAlgorithmLocal, FlokDataFrame
 
@@ -36,7 +35,7 @@ class Period(FlokAlgorithmLocal):
                 period = i
                 break
         output_data.iloc[0, 1] = period
-        output_data.iloc[0, 0] = datetime.strptime('1970-01-01 08:00:00', "%Y-%m-%d %H:%M:%S").strftime("%Y-%m-%d 08:00:00")
+        output_data.iloc[0, 0] = '1970-01-01 08:00:00.000'
         
         result = FlokDataFrame()
         result.addDF(output_data)

@@ -1,7 +1,5 @@
 from FlokAlgorithmLocal import FlokAlgorithmLocal, FlokDataFrame
-from datetime import datetime
 import pandas as pd
-import time
 class Spread(FlokAlgorithmLocal):
     def run(self, inputDataSets, params):
         input_data = inputDataSets.get(0)
@@ -15,5 +13,3 @@ class Spread(FlokAlgorithmLocal):
         result = FlokDataFrame()
         result.addDF(output_data)
         return result
-
-

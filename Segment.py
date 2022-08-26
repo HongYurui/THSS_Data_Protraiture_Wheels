@@ -1,8 +1,6 @@
-from email.policy import default
 from FlokAlgorithmLocal import FlokAlgorithmLocal, FlokDataFrame
 import numpy as np
 import pandas as pd
-from datetime import datetime
 
 
 class Segment(FlokAlgorithmLocal):
@@ -89,11 +87,7 @@ class Segment(FlokAlgorithmLocal):
         # 如果输入是等差数列直接输出
         if all([((output_data[column][i] - output_data[column][i-1])-(output_data[column][1] - output_data[column][0])) < 1e-10 for i in range(1, len(output_data))]):
             if output == 'all':
-                Time = []
-                for i in range(len(output_data)):
-                    Time.append(datetime.fromtimestamp((i+1)/1000.0))
-                Time = pd.Series(
-                    [t.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3] for t in Time])
+                Time = [pd.to_datetime((i + 1) / 1000.0, unit='s', utc=True).tz_convert("Asia/Shanghai").strftime('%Y-%m-%d %H:%M:%S.%f')[:-3] for i in range(len(output_data))]
                 output_data = pd.DataFrame(
                     {'Time': Time, value_header: output_data[column]})
             else:
@@ -102,23 +96,16 @@ class Segment(FlokAlgorithmLocal):
         else:
             seg_piece = Segment.Bottom_Up(list(output_data[column]), error)
             data = []
-            Time = []
             if output == 'all':
                 for i in range(len(seg_piece)):
                     data += seg_piece[i]
-                for i in range(len(output_data)):
-                    Time.append(datetime.fromtimestamp((i+1)/1000.0))
-                Time = pd.Series(
-                    [t.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3] for t in Time])
+                Time = [pd.to_datetime((i + 1) / 1000.0, unit='s', utc=True).tz_convert("Asia/Shanghai").strftime('%Y-%m-%d %H:%M:%S.%f')[:-3] for i in range(len(output_data))]
                 output_data = pd.DataFrame(
                     {'Time': Time, value_header: data})
             else:
                 for i in range(len(seg_piece)):
                     data.append(seg_piece[i][0])
-                for i in range(len(data)):
-                    Time.append(datetime.fromtimestamp((i+1)/1000.0))
-                Time = pd.Series(
-                    [t.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3] for t in Time])
+                Time = [pd.to_datetime((i + 1) / 1000.0, unit='s', utc=True).tz_convert("Asia/Shanghai").strftime('%Y-%m-%d %H:%M:%S.%f')[:-3] for i in range(len(data))]
                 output_data = pd.DataFrame({'Time': Time, value_header: data})
 
         result = FlokDataFrame()

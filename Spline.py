@@ -2,7 +2,6 @@ from FlokAlgorithmLocal import FlokAlgorithmLocal, FlokDataFrame
 import time
 import numpy as np
 import pandas as pd
-from datetime import datetime
 from typing import Tuple, List
 import bisect
 
@@ -84,11 +83,7 @@ class Spline(FlokAlgorithmLocal):
             spline = Spline.compute_spline(Time, value)
             x = (np.linspace(min(Time), max(Time), points)).tolist()
             y = [spline(t) for t in x]
-            for i in range(0, len(x)):
-                x[i] = datetime.fromtimestamp(x[i])
-                # print(type(x[i]))
-            Time = pd.Series(
-                [t.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3] for t in x])
+            x = [pd.to_datetime(i, unit='s', utc=True).tz_convert("Asia/Shanghai").strftime('%Y-%m-%d %H:%M:%S.%f')[:-3] for i in x]
             j = 'spline({},\'points\'=\'{}\')'.format(column, points)
             data = {'Time': x, j: y}
             output_data = pd.DataFrame(data)

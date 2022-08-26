@@ -1,9 +1,7 @@
-from datetime import date, datetime
 from FlokAlgorithmLocal import FlokAlgorithmLocal, FlokDataFrame
 import math
 import pandas as pd
-from datetime import datetime
-import numpy as np
+
 
 class Zscore(FlokAlgorithmLocal):
     def run(self, inputDataSets, params):
@@ -12,11 +10,7 @@ class Zscore(FlokAlgorithmLocal):
         output_data.dropna(inplace=True)
         column = input_data.columns[1]
         compute = params.get('compute', 'batch')
-        Time = []
-        for i in range(len(output_data)):
-            Time.append(datetime.fromtimestamp((i+1)/1000))
-        Time = pd.Series([t.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
-                         for t in Time])
+        Time = [pd.to_datetime((i + 1) / 1000.0, unit='s', utc=True).tz_convert("Asia/Shanghai") .strftime('%Y-%m-%d %H:%M:%S.%f')[:-3] for i in range(len(output_data))]
         if compute == 'stream':
             avg = params.get("avg", 0)
             std = params.get("std", 1)
@@ -41,5 +35,3 @@ class Zscore(FlokAlgorithmLocal):
         result = FlokDataFrame()
         result.addDF(output_data)
         return result
-
-

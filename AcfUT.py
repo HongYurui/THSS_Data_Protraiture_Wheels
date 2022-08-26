@@ -7,7 +7,7 @@ from Acf import Acf
 class AcfUT(unittest.TestCase):
 
     def setUp(self):
-        input_paths = ["./root_test_d2.csv"]#use a large thing
+        input_paths = ["root_test_d2"]#use a large thing
         input_types = ["csv"]
         input_location = ["local_fs"]
         output_paths = ["root_test_d1_out.csv"]
