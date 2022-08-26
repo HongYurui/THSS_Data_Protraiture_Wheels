@@ -2,12 +2,14 @@ import unittest
 from FlokAlgorithmLocal import FlokDataFrame, FlokAlgorithmLocal
 from SelectTimeseries import SelectTimeseries
 from Stddev import Stddev
-
+import os
 
 class StddevUT(unittest.TestCase):
 
     def setUp(self):
-        input_paths = ["root_test_d2"]
+        path = os.path.abspath('.')
+        path += '\data\\root_test_d2'
+        input_paths = [path]
         input_types = ["csv"]
         input_location = ["local_fs"]
         output_paths = ["root_test_d1_out.csv"]

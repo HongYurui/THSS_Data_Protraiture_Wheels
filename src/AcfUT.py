@@ -2,12 +2,13 @@ import unittest
 from FlokAlgorithmLocal import FlokDataFrame, FlokAlgorithmLocal
 from SelectTimeseries import SelectTimeseries
 from Acf import Acf
-
-
+import os
 class AcfUT(unittest.TestCase):
 
     def setUp(self):
-        input_paths = ["root_test_d2"]#use a large thing
+        path = os.path.abspath('.')
+        path +='\data\\root_test_d2'
+        input_paths = [path]  # use a large dataset
         input_types = ["csv"]
         input_location = ["local_fs"]
         output_paths = ["root_test_d1_out.csv"]
