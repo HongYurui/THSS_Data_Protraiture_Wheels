@@ -18,7 +18,7 @@ class Segment(FlokAlgorithmLocal):
 
     # 线性拟合
     def linear(a):
-        x = np.arange(len(a))
+        x = np.arange(0, len(a))
         y = np.array(a)
         # 返回回归系数
         x_, y_ = x.mean(), y.mean()
@@ -33,10 +33,10 @@ class Segment(FlokAlgorithmLocal):
         seg_piece = []  # 最终返回的分段
         seg = []  # 储存分段两头位置
         merge_cost = []  # 计算合并带来的误差
-        for i in range(len(T), 2):
+        for i in range(0, len(T), 2):
             seg_piece += [T[i:i + 2]]
             seg.append((i, i + 1))
-        for i in range(len(seg_piece) - 2):
+        for i in range(0, len(seg_piece) - 2):
             merge_cost.insert(i, Segment.calculate_error(
                 T, (seg[i][0], seg[i + 1][1])))
         while min(merge_cost) < max_error:
@@ -85,7 +85,7 @@ class Segment(FlokAlgorithmLocal):
             step = int(len(input_data) / k)
             for i in range(k):
                 output_data.iloc[i] = input_data.iloc[i * step]
-            output_data=output_data.iloc[:k]
+            output_data = output_data.iloc[:k]
         # 如果输入是等差数列直接输出
         if all([((output_data[column][i] - output_data[column][i-1])-(output_data[column][1] - output_data[column][0])) < 1e-10 for i in range(1, len(output_data))]):
             if output == 'all':

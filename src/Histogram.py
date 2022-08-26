@@ -6,7 +6,6 @@ class Histogram(FlokAlgorithmLocal):
     def run(self, inputDataSets, params):
         input_data = inputDataSets.get(0)
         output_data = input_data
-        output_data.dropna(inplace=True)
         column = input_data.columns[1]
         max_value = float(max(output_data[column]))
         min_num = params.get("min", -max_value)
@@ -28,7 +27,6 @@ class Histogram(FlokAlgorithmLocal):
                     '\'=\'' + str(params[param]) + '\''
         value_header += ')'
         bucket = [0]*count
-        print(type(output_data[column][0]))
         for j in range(len(output_data[column])):
             if output_data[column][j] < min_num:
                 bucket[0] += 1
@@ -40,7 +38,6 @@ class Histogram(FlokAlgorithmLocal):
                             and output_data[column][j] < min_num+i*(max_num-min_num)/count):
                         bucket[i-1] += 1
         Time = [pd.to_datetime((i + 1) / 1000.0, unit='s', utc=True).tz_convert("Asia/Shanghai") .strftime('%Y-%m-%d %H:%M:%S.%f')[:-3] for i in range(count)]
-        #j = 'histogram({},\'min\'=\'{}\',\'max\'=\'{}\',\'count\'=\'{}\')'.format(column, min, max_, count)
         data = {'Time': Time, value_header: bucket}
         output_data = pd.DataFrame(data)
         result = FlokDataFrame()
