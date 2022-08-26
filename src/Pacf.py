@@ -38,7 +38,7 @@ class Pacf(FlokAlgorithmLocal):
         
         data = pacf(np.array(input_data.iloc[:, 1]), lag)
         output_data.insert(loc=len(output_data.columns), column=value_header, value=data)
-        for i in range(0, lag+1):
+        for i in range(lag+1):
             output_data.iloc[i, 0] = input_data.iloc[i, 0]
 
         result = FlokDataFrame()
