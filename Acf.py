@@ -1,9 +1,5 @@
 from FlokAlgorithmLocal import FlokAlgorithmLocal, FlokDataFrame
 import pandas as pd
-<<<<<<< HEAD
-=======
-from datetime import datetime
->>>>>>> b0d5795b9bdc37dcc05b617f15256f715d49b06a
 
 class Acf(FlokAlgorithmLocal):
     def run_acf(x):
