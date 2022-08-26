@@ -67,6 +67,7 @@ class Spline(FlokAlgorithmLocal):
     def run(self, inputDataSets, params):
         input_data = inputDataSets.get(0)
         output_data = input_data
+        output_data.dropna(inplace=True)
         points = params.get("points", None)
         if isinstance(points, str):
             points = int(points)

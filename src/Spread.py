@@ -5,6 +5,7 @@ class Spread(FlokAlgorithmLocal):
         input_data = inputDataSets.get(0)
         column=input_data.columns[1]
         output_data = input_data
+        output_data.dropna(inplace=True)
         spread = max(output_data[column])-min(output_data[column])
         j = 'spread({})'.format(column)
         output_data = pd.DataFrame(

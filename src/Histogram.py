@@ -6,6 +6,7 @@ class Histogram(FlokAlgorithmLocal):
     def run(self, inputDataSets, params):
         input_data = inputDataSets.get(0)
         output_data = input_data
+        output_data.dropna(inplace=True)
         column = input_data.columns[1]
         max_value = float(max(output_data[column]))
         min_num = params.get("min", -max_value)
