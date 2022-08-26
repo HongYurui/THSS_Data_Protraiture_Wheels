@@ -12,7 +12,7 @@ class Mode(FlokAlgorithmLocal):
         output_data = pd.DataFrame([[0, 0]], index=range(1), columns=['Time', value_header])
         
         nannum = 0
-        for j in range(0, input_data.shape[0]):
+        for j in range(input_data.shape[0]):
             if input_data.iloc[j, 1] == nan:
                 nannum += 1
         if nannum > (input_data.iloc[:, 1] == input_data.iloc[:, 1].mode()[0]).sum():

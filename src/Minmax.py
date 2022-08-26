@@ -24,7 +24,7 @@ class Minmax(FlokAlgorithmLocal):
         output_data = pd.DataFrame(index=range(input_data.shape[0]), columns=['Time', value_header], dtype=object)
         MAX = input_data.iloc[:, 1].max()
         MIN = input_data.iloc[:, 1].min()
-        for i in range(0, input_data.shape[0]):
+        for i in range(input_data.shape[0]):
             if compute == "stream":
                 output_data.iloc[i, 1] = (input_data.iloc[i, 1] - MIN)/(MAX - MIN)*(max - min) + min
             else:

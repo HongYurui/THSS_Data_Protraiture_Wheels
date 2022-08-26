@@ -64,14 +64,14 @@ class FlokDataFrame:
 class FlokAlgorithmLocal:
     def pandasDfToNpArray(self, pandasDfList):
         npArrayList = []
-        for i in range(0, len(pandasDfList)):
+        for i in range(len(pandasDfList)):
             npArray = pandasDfList[i].values
             npArrayList.append(npArray)
         return npArrayList
 
     def npArrayToPandasDf(self, npArrayList):
         pandasDfList = []
-        for i in range(0, len(npArrayList)):
+        for i in range(len(npArrayList)):
             pandasDf = pd.DataFrame(npArrayList[i])
             pandasDfList.append(pandasDf)
         return pandasDfList
@@ -85,7 +85,7 @@ class FlokAlgorithmLocal:
             return
         flokDM = FlokDataFrame()
         inputLen = len(inputPaths)
-        for i in range(0, inputLen):
+        for i in range(inputLen):
             if inputLocation[i] == "local_fs":
                 globalInputType = inputTypes[i]
                 if globalInputType == "csv":
@@ -182,7 +182,7 @@ class FlokAlgorithmLocal:
                 print("inputLocation not existing")
             flokDM.addDF(data)
         outputLen = len(outputPaths)
-        for i in range(0, outputLen):
+        for i in range(outputLen):
             if outputTypes[i] == "model":
                 flokDM.addModelOutputPath(outputPaths[i])
         return flokDM
@@ -201,7 +201,7 @@ class FlokAlgorithmLocal:
         if (outputLen != len(outputLocation)):
             print("outputPathLen is not equal to outputLocationLen")
             return
-        for i in range(0, outputLen):
+        for i in range(outputLen):
             outData = outputData.next()
             if outputLocation[i] == "local_fs":
                 if outputTypes[i] == "csv":
