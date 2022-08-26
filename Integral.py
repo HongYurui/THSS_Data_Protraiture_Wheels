@@ -19,11 +19,11 @@ class Integral(FlokAlgorithmLocal):
 
         # integration
         i = 0
-        while pd.isnull(value_data[i]):
+        while pd.isna(value_data[i]):
             i += 1
         while i < len(value_data) - 1:
             j = i + 1
-            while pd.isnull(value_data[j]):
+            while pd.isna(value_data[j]):
                 j += 1
             output_data.iloc[0, 1] += (value_data[i] + value_data[j]) * (time_data[j] - time_data[i]).seconds / 2
             i = j

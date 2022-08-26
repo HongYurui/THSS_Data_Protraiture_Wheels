@@ -10,9 +10,9 @@ class Integralavg(FlokAlgorithmLocal):
         second_data = pd.to_datetime(input_data.iloc[1, 0])
         time_delta = second_data - start
         end = pd.to_datetime(input_data.iloc[-1, 0])
-        while pd.isnull(start):
+        while pd.isna(start):
             start += 1
-        while pd.isnull(end):
+        while pd.isna(end):
             end -= 1
         timespan = (end - start + time_delta).total_seconds()
         output_data = pd.DataFrame([[integral_frame.iloc[0, 0], integral_frame.iloc[0, 1] / timespan]], index=range(1), columns=['Time', "integralavg" + integral_frame.columns[1][8:]])

@@ -1,6 +1,6 @@
 import re
 import os
-from pandas import merge, isna
+from pandas import isna
 from pandasql import sqldf
 from FlokAlgorithmLocal import FlokAlgorithmLocal, FlokDataFrame
 from Acf import Acf
@@ -50,7 +50,7 @@ while True:
         """)
     elif command in ["clear", "clc", "cls"]:
         os.system("clear")
-    elif command == "ls" or command[:3] == "ls " or command[:4] == "cat ":
+    elif command == "ls" or command[:3] == "ls " or command[:4] in ["cat ", "dir "]:
         os.system(command)
     elif command == "cd" or command[:3] == "cd ":
         print("changing directory is not supported")
@@ -73,6 +73,7 @@ while True:
                 globals()[inputPath] = globals()[originalInput].copy()
                 print(sqldf(command))
                 continue
+
             # handle queries for function results
             funcName = pattern[0].capitalize()
             params = dict(re.findall(r"\'(\w+)\'\s*=\s*\'([\w\s\-\.:]+)\'", pattern[2]))

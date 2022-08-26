@@ -7,8 +7,8 @@ class Resample(FlokAlgorithmLocal):
         input_data = inputDataSets.get(0)
         time_data = pd.Series([pd.to_datetime(data, format="%Y-%m-%d %H:%M:%S") for data in input_data.iloc[:, 0].values])
         value_data = input_data.iloc[:, 1].astype(float)
-        left = next(time_data[i] for i in range(len(time_data)) if not pd.isnull(value_data[i]))
-        right = next(time_data[i] for i in range(len(time_data)-1,-1,-1) if not pd.isnull(value_data[i]))
+        left = next(time_data[i] for i in range(len(time_data)) if not pd.isna(value_data[i]))
+        right = next(time_data[i] for i in range(len(time_data)-1,-1,-1) if not pd.isna(value_data[i]))
 
         # get parameters
         every = params.get("every")
