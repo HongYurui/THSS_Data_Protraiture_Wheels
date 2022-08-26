@@ -72,6 +72,8 @@ class Segment(FlokAlgorithmLocal):
         error = params.get("error", 0.1)
         if isinstance(error, str):
             error = float(error)
+        if error < 0 :
+            raise ValueError("error must be bigger than or equal to 0")
         value_header = 'segment(' + column
         param_list = ['output', 'error']
         for param in param_list:

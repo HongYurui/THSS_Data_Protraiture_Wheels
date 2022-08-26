@@ -71,6 +71,8 @@ class Spline(FlokAlgorithmLocal):
         points = params.get("points", None)
         if isinstance(points, str):
             points = int(points)
+        if points <= 0:
+            raise ValueError("points must be bigger than 0")
         if len(output_data) >= 4:
             column = input_data.columns[1]
             #output_data[column] = output_data[column]**3
