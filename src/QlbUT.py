@@ -20,10 +20,10 @@ class QlbUT(unittest.TestCase):
         self.serieslength = 20
         self.params = {}
 
-    # def test_qlb_2(self):
-    #     self.timeseries = {"timeseries": "Time,s13"}
-    #     self.serieslength = 20
-    #     self.params = {"lag": "5"}
+    def test_qlb_2(self):
+        self.timeseries = {"timeseries": "Time,s13"}
+        self.serieslength = 20
+        self.params = {"lag": "5"}
 
     def tearDown(self):
         dataset = FlokDataFrame()

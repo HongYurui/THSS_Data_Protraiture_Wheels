@@ -29,10 +29,10 @@ class Qlb(FlokAlgorithmLocal):
         timedelta = pd.to_timedelta(0.001, unit="s")
 
         # calculate square acf
-        acf_data = acf(value_data)[1:]
+        acf_data = acf(value_data, nlags=n-2)[1:]
         weighted_square_acf = [x ** 2 / (n - i - 1) for i, x in enumerate(acf_data)]
         sum_weighted_square_acf = 0
-        print(len(acf_data), len(weighted_square_acf))
+        print(len(value_data), len(acf_data), len(weighted_square_acf))
 
         for i in range(lag):
             print(i)
