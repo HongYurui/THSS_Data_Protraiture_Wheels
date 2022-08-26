@@ -29,17 +29,17 @@ class Qlb(FlokAlgorithmLocal):
         timedelta = pd.to_timedelta(0.001, unit="s")
 
         # calculate square acf
-        # acf_data = Acf().run(inputDataSets, {}).get(0).iloc[:, 1].values
-        # acf_data /= max(acf_data)
-        # print(acf_data)
+
         acf_data = acf(value_data)[1:]
-        square_acf = [x ** 2 / (n - i - 1) for i, x in enumerate(acf_data)]
+        weighted_square_acf = [x ** 2 / (n - i - 1) for i, x in enumerate(acf_data)]
+        sum_weighted_square_acf = 0
 
         for i in range(lag):
             timestamp += timedelta
+            sum_weighted_square_acf += weighted_square_acf[i]
             output_data.iloc[i, 0] = timestamp.strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
             # LB Q-test
-            output_data.iloc[i, 1] = 1 - chi2.cdf(n * (n + 2) * sum(square_acf[:(i + 1)]), i + 1)
+            output_data.iloc[i, 1] = 1 - chi2.cdf(n * (n + 2) * sum_weighted_square_acf, i + 1)
 
         result = FlokDataFrame()
         result.addDF(output_data)
