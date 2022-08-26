@@ -5,10 +5,10 @@ from Pacf import Pacf
 
 class PacfUT(unittest.TestCase):
     def setUp(self):
-        input_paths = ["root_test_zmy"]
+        input_paths = ["../data/root_test_zmy"]
         input_types = ["csv"]
         input_location = ["local_fs"]
-        output_paths = ["root_test_zmy_out.csv"]
+        output_paths = ["../data/root_test_zmy_out.csv"]
         output_types = ["csv"]
         self.orif_dataset = FlokAlgorithmLocal().read(input_paths, input_types, input_location, output_paths, output_types)
         self.algorithm = Pacf()
@@ -45,10 +45,10 @@ class PacfUT(unittest.TestCase):
         result = self.algorithm.run(dataset, self.params)
 
     def test_pacf_6(self):
-        input_paths = ["root_test_d1"]
+        input_paths = ["../data/root_test_d1"]
         input_types = ["csv"]
         input_location = ["local_fs"]
-        output_paths = ["root_test_zmy_out.csv"]
+        output_paths = ["../data/root_test_zmy_out.csv"]
         output_types = ["csv"]
         self.orif_dataset = FlokAlgorithmLocal().read(input_paths, input_types, input_location, output_paths, output_types)
         self.algorithm = Pacf()
