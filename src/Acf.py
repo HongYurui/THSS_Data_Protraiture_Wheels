@@ -1,6 +1,5 @@
 from FlokAlgorithmLocal import FlokAlgorithmLocal, FlokDataFrame
 import pandas as pd
-import numpy as np
 
 class Acf(FlokAlgorithmLocal):
     def run_acf(x):
